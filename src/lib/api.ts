@@ -12,7 +12,30 @@ export function randomId() {
   return nanoid()
 }
 
-export async function createGroup(groupFormValues: GroupFormValues) {
+async function resolveParticipants(participantsData: any[], creatorId?: string, creatorDisplayName?: string) {
+  const names = participantsData.map(p => p.name)
+  const users = await prisma.user.findMany({
+    where: {
+      OR: [
+        { uniqueId: { in: names } },
+        { displayName: { in: names } }
+      ]
+    }
+  })
+
+  return participantsData.map(p => {
+    if (creatorId && p.name === creatorDisplayName) {
+      return { ...p, userId: creatorId }
+    }
+    const user = users.find(u => u.uniqueId === p.name || u.displayName === p.name)
+    if (user) {
+      return { ...p, userId: user.id }
+    }
+    return p
+  })
+}
+
+export async function createGroup(groupFormValues: GroupFormValues, creatorId?: string, creatorDisplayName?: string) {
   return prisma.group.create({
     data: {
       id: randomId(),
@@ -20,12 +43,13 @@ export async function createGroup(groupFormValues: GroupFormValues) {
       information: groupFormValues.information,
       currency: groupFormValues.currency,
       currencyCode: groupFormValues.currencyCode,
+      creatorId,
       participants: {
         createMany: {
-          data: groupFormValues.participants.map(({ name }) => ({
+          data: await resolveParticipants(groupFormValues.participants.map(({ name }) => ({
             id: randomId(),
             name,
-          })),
+          })), creatorId, creatorDisplayName),
         },
       },
     },
@@ -314,12 +338,12 @@ export async function updateGroup(
             },
           })),
         createMany: {
-          data: groupFormValues.participants
+          data: await resolveParticipants(groupFormValues.participants
             .filter((participant) => participant.id === undefined)
             .map((participant) => ({
               id: randomId(),
               name: participant.name,
-            })),
+            }))),
         },
       },
     },
@@ -366,7 +390,7 @@ export async function getGroupExpenses(
     where: {
       groupId,
       title: options?.filter
-        ? { contains: options.filter, mode: 'insensitive' }
+        ? { contains: options.filter }
         : undefined,
     },
     orderBy: [{ expenseDate: 'desc' }, { createdAt: 'desc' }],

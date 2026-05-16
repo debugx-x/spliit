@@ -20,6 +20,8 @@ model Group {
   expenses     Expense[]
   activities   Activity[]
   createdAt    DateTime      @default(now())
+  creatorId    String?
+  creator      User?         @relation("GroupCreator", fields: [creatorId], references: [id])
 }
 
 model Participant {
@@ -29,6 +31,8 @@ model Participant {
   groupId         String
   expensesPaidBy  Expense[]
   expensesPaidFor ExpensePaidFor[]
+  userId          String?
+  user            User?            @relation(fields: [userId], references: [id])
 }
 
 model Category {
@@ -129,4 +133,17 @@ enum ActivityType {
   CREATE_EXPENSE
   UPDATE_EXPENSE
   DELETE_EXPENSE
+}
+
+model User {
+  id              String        @id @default(uuid())
+  uniqueId        String        @unique
+  displayName     String
+  email           String        @unique
+  passwordHash    String
+  defaultCurrency String        @default("CAD")
+  createdAt       DateTime      @default(now())
+  
+  createdGroups   Group[]       @relation("GroupCreator")
+  participations  Participant[]
 }
