@@ -39,3 +39,7 @@ next-env.d.ts
 
 # db
 postgres-data
+
+.venv-spec
+.gemini
+.specify
