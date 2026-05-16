@@ -40,6 +40,7 @@ next-env.d.ts
 # db
 postgres-data
 
-.venv-spec
-.gemini
+.agents
 .specify
+tsc-errors.txt
+.next-dev.*

@@ -4,13 +4,14 @@ import { GroupForm } from '@/components/group-form'
 import { trpc } from '@/trpc/client'
 import { useRouter } from 'next/navigation'
 
-export const CreateGroup = () => {
+export const CreateGroup = ({ session }: { session: any }) => {
   const { mutateAsync } = trpc.groups.create.useMutation()
   const utils = trpc.useUtils()
   const router = useRouter()
 
   return (
     <GroupForm
+      session={session}
       onSubmit={async (groupFormValues) => {
         const { groupId } = await mutateAsync({ groupFormValues })
         await utils.groups.invalidate()

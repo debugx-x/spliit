@@ -1,6 +1,7 @@
 import { deleteExpense } from '@/lib/api'
 import { baseProcedure } from '@/trpc/init'
 import { z } from 'zod'
+import { TRPCError } from '@trpc/server'
 
 export const deleteGroupExpenseProcedure = baseProcedure
   .input(
@@ -10,7 +11,10 @@ export const deleteGroupExpenseProcedure = baseProcedure
       participantId: z.string().optional(),
     }),
   )
-  .mutation(async ({ input: { expenseId, groupId, participantId } }) => {
+  .mutation(async ({ input: { expenseId, groupId, participantId }, ctx }) => {
+    if (!ctx.session?.userId) {
+      throw new TRPCError({ code: 'UNAUTHORIZED' })
+    }
     await deleteExpense(groupId, expenseId, participantId)
     return {}
   })

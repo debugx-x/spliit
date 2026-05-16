@@ -13,6 +13,7 @@ import { getLocale, getMessages } from 'next-intl/server'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Suspense } from 'react'
+import { getSession } from '@/lib/auth'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -63,7 +64,7 @@ export const viewport: Viewport = {
   themeColor: '#047857',
 }
 
-function Content({ children }: { children: React.ReactNode }) {
+function Content({ children, session }: { children: React.ReactNode, session: any }) {
   const t = useTranslations()
   return (
     <TRPCProvider>
@@ -94,6 +95,29 @@ function Content({ children }: { children: React.ReactNode }) {
                 <Link href="/groups">{t('Header.groups')}</Link>
               </Button>
             </li>
+            {session ? (
+              <li>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  asChild
+                  className="-my-3 text-primary"
+                >
+                  <Link href="/profile">{session.displayName}</Link>
+                </Button>
+              </li>
+            ) : (
+              <li>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  asChild
+                  className="-my-3 text-primary"
+                >
+                  <Link href="/login">Login</Link>
+                </Button>
+              </li>
+            )}
             <li>
               <LocaleSwitcher />
             </li>
@@ -154,6 +178,7 @@ export default async function RootLayout({
 }) {
   const locale = await getLocale()
   const messages = await getMessages()
+  const session = await getSession()
   return (
     <html lang={locale} suppressHydrationWarning>
       <ApplePwaSplash icon="/logo-with-text.png" color="#027756" />
@@ -168,7 +193,7 @@ export default async function RootLayout({
             <Suspense>
               <ProgressBar />
             </Suspense>
-            <Content>{children}</Content>
+            <Content session={session}>{children}</Content>
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

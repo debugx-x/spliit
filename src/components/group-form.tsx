@@ -50,12 +50,14 @@ export type Props = {
     participantId?: string,
   ) => Promise<void>
   protectedParticipantIds?: string[]
+  session?: any
 }
 
 export function GroupForm({
   group,
   onSubmit,
   protectedParticipantIds = [],
+  session,
 }: Props) {
   const locale = useLocale()
   const t = useTranslations('GroupForm')
@@ -73,8 +75,12 @@ export function GroupForm({
           name: '',
           information: '',
           currency: '',
-          currencyCode: process.env.NEXT_PUBLIC_DEFAULT_CURRENCY_CODE || 'USD', // TODO: If NEXT_PUBLIC_DEFAULT_CURRENCY_CODE, is not set, determine the default currency code based on locale
-          participants: [
+          currencyCode: session?.defaultCurrency || process.env.NEXT_PUBLIC_DEFAULT_CURRENCY_CODE || 'CAD',
+          participants: session ? [
+            { name: session.displayName },
+            { name: t('Participants.Jane') },
+            { name: t('Participants.Jack') },
+          ] : [
             { name: t('Participants.John') },
             { name: t('Participants.Jane') },
             { name: t('Participants.Jack') },

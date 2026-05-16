@@ -12,18 +12,18 @@ superjson.registerCustom<Prisma.Decimal, string>(
   'decimal.js',
 )
 
+import { getSession } from '@/lib/auth'
+
 export const createTRPCContext = cache(async () => {
-  /**
-   * @see: https://trpc.io/docs/server/context
-   */
-  return {}
+  const session = await getSession()
+  return { session }
 })
 
 // Avoid exporting the entire t-object
 // since it's not very descriptive.
 // For instance, the use of a t variable
 // is common in i18n libraries.
-const t = initTRPC.create({
+const t = initTRPC.context<typeof createTRPCContext>().create({
   /**
    * @see https://trpc.io/docs/server/data-transformers
    */
