@@ -43,3 +43,5 @@ postgres-data
 .venv-spec
 .gemini
 .specify
+.next-dev.*
+tsc-errors.txt
