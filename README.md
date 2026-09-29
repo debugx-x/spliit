@@ -78,6 +78,26 @@ Here is the current state of translation:
 
 The database must either be empty or have been created by `prisma migrate`. A database created with `prisma db push` has no migration history and `migrate deploy` will fail with `P3005`; reset it (`npx prisma migrate reset`, which deletes all data) or [baseline it](https://www.prisma.io/docs/orm/prisma-migrate/workflows/baselining).
 
+## Backups
+
+The [Database backup](.github/workflows/db-backup.yml) workflow runs every night: it dumps the database with `pg_dump`, encrypts the dump with a passphrase and keeps it as a workflow artifact for 30 days. Encryption matters because artifacts of a public repository can be downloaded by any GitHub user.
+
+Setup (GitHub → repository **Settings** → **Secrets and variables** → **Actions** → **New repository secret**):
+
+- `BACKUP_DATABASE_URL`: the direct `postgres://…` connection string (same as `POSTGRES_URL` in Vercel)
+- `BACKUP_PASSPHRASE`: a long random passphrase. Store it in your password manager: without it the backups can't be read.
+
+To take a backup right away, open **Actions** → **Database backup** → **Run workflow**. If a scheduled run fails, GitHub emails you.
+
+To restore, download the artifact (a zip containing `backup.dump.gpg`) from the workflow run, then:
+
+```bash
+gpg --decrypt backup.dump.gpg > backup.dump   # asks for BACKUP_PASSPHRASE
+pg_restore --clean --if-exists --no-owner --no-privileges -d "<postgres://… URL of the target database>" backup.dump
+```
+
+`pg_restore` replaces the tables in the target database with the backup's contents, so try it on an empty database first.
+
 ## Health check
 
 The application has a health check endpoint that can be used to check if the application is running and if the database is accessible.
