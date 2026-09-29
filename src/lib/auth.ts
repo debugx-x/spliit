@@ -1,5 +1,6 @@
 import { jwtVerify, SignJWT } from 'jose';
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { env } from '@/lib/env';
 
 const key = new TextEncoder().encode(env.JWT_SECRET);
@@ -48,6 +49,30 @@ export async function getSession() {
   const session = cookieStore.get('session')?.value;
   if (!session) return null;
   return await decrypt(session);
+}
+
+// Returns the session, or redirects to the login page (coming back to
+// `next` afterwards) when the user isn't logged in.
+export async function requireSession(next: string) {
+  const session = await getSession();
+  if (!session) {
+    redirect(`/login?next=${encodeURIComponent(next)}`);
+  }
+  return session;
+}
+
+// Only allow same-origin relative paths as post-login redirect targets,
+// so `?next=` can't be used to send users to another site.
+export function safeRedirectPath(next: unknown, fallback = '/groups') {
+  if (
+    typeof next !== 'string' ||
+    !next.startsWith('/') ||
+    next.startsWith('//') ||
+    next.startsWith('/\\')
+  ) {
+    return fallback;
+  }
+  return next;
 }
 
 export async function deleteSession() {

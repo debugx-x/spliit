@@ -1,6 +1,6 @@
 'use server'
 
-import { createSession } from '@/lib/auth'
+import { createSession, safeRedirectPath } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { compare, hash } from 'bcryptjs'
 import { redirect } from 'next/navigation'
@@ -16,12 +16,22 @@ const registerSchema = z.object({
   password: z.string().min(6, 'Password must be at least 6 characters'),
 })
 
+// Submitted values (minus the password) are returned with errors so the
+// form can be re-filled: React resets uncontrolled forms after an action.
+function formValues(formData: FormData, keys: string[]) {
+  return Object.fromEntries(
+    keys.map((key) => [key, String(formData.get(key) ?? '')]),
+  )
+}
+
 export async function registerAction(prevState: any, formData: FormData) {
+  const values = formValues(formData, ['displayName', 'uniqueId', 'email'])
   const parsed = registerSchema.safeParse(Object.fromEntries(formData))
 
   if (!parsed.success) {
     return {
       error: parsed.error.issues[0].message,
+      values,
     }
   }
 
@@ -36,9 +46,9 @@ export async function registerAction(prevState: any, formData: FormData) {
 
     if (existingUser) {
       if (existingUser.uniqueId === uniqueId) {
-        return { error: 'Unique ID is already taken.' }
+        return { error: 'Unique ID is already taken.', values }
       }
-      return { error: 'Email is already registered.' }
+      return { error: 'Email is already registered.', values }
     }
 
     const passwordHash = await hash(password, 10)
@@ -59,10 +69,10 @@ export async function registerAction(prevState: any, formData: FormData) {
     })
   } catch (error) {
     console.log(error)
-    return { error: 'Something went wrong. Please try again.' }
+    return { error: 'Something went wrong. Please try again.', values }
   }
 
-  redirect('/groups') // Or wherever the dashboard is
+  redirect(safeRedirectPath(formData.get('next')))
 }
 
 const loginSchema = z.object({
@@ -71,10 +81,11 @@ const loginSchema = z.object({
 })
 
 export async function loginAction(prevState: any, formData: FormData) {
+  const values = formValues(formData, ['uniqueId'])
   const parsed = loginSchema.safeParse(Object.fromEntries(formData))
 
   if (!parsed.success) {
-    return { error: 'Invalid credentials' }
+    return { error: 'Invalid credentials', values }
   }
 
   const { uniqueId, password } = parsed.data
@@ -87,13 +98,13 @@ export async function loginAction(prevState: any, formData: FormData) {
     })
 
     if (!user) {
-      return { error: 'Invalid credentials' }
+      return { error: 'Invalid credentials', values }
     }
 
     const passwordsMatch = await compare(password, user.passwordHash)
 
     if (!passwordsMatch) {
-      return { error: 'Invalid credentials' }
+      return { error: 'Invalid credentials', values }
     }
 
     await createSession({
@@ -104,8 +115,8 @@ export async function loginAction(prevState: any, formData: FormData) {
   } catch (error) {
     console.log(error)
 
-    return { error: 'Something went wrong. Please try again.' }
+    return { error: 'Something went wrong. Please try again.', values }
   }
 
-  redirect('/groups')
+  redirect(safeRedirectPath(formData.get('next')))
 }

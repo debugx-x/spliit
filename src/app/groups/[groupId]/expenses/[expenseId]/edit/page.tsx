@@ -1,4 +1,5 @@
 import { EditExpenseForm } from '@/app/groups/[groupId]/expenses/edit-expense-form'
+import { requireSession } from '@/lib/auth'
 import { getRuntimeFeatureFlags } from '@/lib/featureFlags'
 import { Metadata } from 'next'
 
@@ -12,6 +13,7 @@ export default async function EditExpensePage({
   params: Promise<{ groupId: string; expenseId: string }>
 }) {
   const { groupId, expenseId } = await params
+  await requireSession(`/groups/${groupId}/expenses/${expenseId}/edit`)
   return (
     <EditExpenseForm
       groupId={groupId}
