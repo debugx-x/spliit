@@ -1,25 +1,19 @@
 import { createGroup } from '@/lib/api'
 import { groupFormSchema } from '@/lib/schemas'
-import { baseProcedure } from '@/trpc/init'
-import { TRPCError } from '@trpc/server'
+import { authedProcedure } from '@/trpc/init'
 import { z } from 'zod'
 
-export const createGroupProcedure = baseProcedure
+export const createGroupProcedure = authedProcedure
   .input(
     z.object({
       groupFormValues: groupFormSchema,
     }),
   )
   .mutation(async ({ input: { groupFormValues }, ctx }) => {
-    if (!ctx.session?.userId) {
-      throw new TRPCError({ code: 'UNAUTHORIZED' })
-    }
-    const creatorId = ctx.session.userId
-    const creatorDisplayName = ctx.session.displayName
     const group = await createGroup(
       groupFormValues,
-      creatorId,
-      creatorDisplayName,
+      ctx.session.userId,
+      ctx.session.displayName,
     )
     return { groupId: group.id }
   })

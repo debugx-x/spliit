@@ -78,6 +78,19 @@
     "NotFound": {
       "text": "Talde hori ez da existitzen.",
       "link": "Joan bisitatutako azken taldeetara"
+    },
+    "Join": {
+      "loading": "Loading group…",
+      "title": "Join {name}",
+      "description": "Which one are you? Pick your name to join this group.",
+      "descriptionNoParticipants": "Join this group to see and add its expenses.",
+      "pickName": "Pick your name",
+      "joinAs": "Join as {name}",
+      "notListed": "I'm not listed, add me as {name}",
+      "addMe": "Join as {name}",
+      "notFoundTitle": "Group not found",
+      "notFoundDescription": "This group doesn't exist, or the link is incomplete. Ask a friend in the group to share its link again.",
+      "backToGroups": "Back to my groups"
     }
   },
   "GroupForm": {
@@ -110,7 +123,13 @@
       "add": "Gehitu kidea",
       "John": "Jon",
       "Jane": "Jone",
-      "Jack": "Santi"
+      "Jack": "Santi",
+      "addFriend": "Add a friend",
+      "addFriendDescription": "Search your friend's Unique ID or name. They'll be added with their account and see the group in their groups right away.",
+      "searchPlaceholder": "Unique ID or name",
+      "searching": "Searching…",
+      "noResults": "No one found. Friends need an account first, or you can share the group link.",
+      "linked": "Linked to an account"
     },
     "Settings": {
       "title": "Ezarpen lokalak",
@@ -344,9 +363,9 @@
   },
   "Share": {
     "title": "Partekatu",
-    "description": "Beste kide batzuek taldea ikusteko eta gastuak gehitzeko, partekatu haiekin URLa.",
+    "description": "To invite friends, share this link. They log in (or sign up) and pick their name to join the group.",
     "warning": "Kontuz!",
-    "warningHelp": "Taldeko URLa duen edozein pertsonak gastuak ikusi eta editatu ahal izango ditu. Partekatu kontuz!"
+    "warningHelp": "Anyone who has this link and an account can join the group, then see and edit its expenses. Only share it with your friends."
   },
   "SchemaErrors": {
     "min1": "Sartu gutxienez karaktere bat.",

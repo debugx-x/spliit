@@ -11,17 +11,18 @@ datasource db {
 }
 
 model Group {
-  id           String        @id
+  id           String                @id
   name         String
-  information  String?       @db.Text
-  currency     String        @default("$")
+  information  String?               @db.Text
+  currency     String                @default("$")
   currencyCode String?
   participants Participant[]
   expenses     Expense[]
   activities   Activity[]
-  createdAt    DateTime      @default(now())
+  preferences  UserGroupPreference[]
+  createdAt    DateTime              @default(now())
   creatorId    String?
-  creator      User?         @relation("GroupCreator", fields: [creatorId], references: [id])
+  creator      User?                 @relation("GroupCreator", fields: [creatorId], references: [id])
 }
 
 model Participant {
@@ -33,6 +34,9 @@ model Participant {
   expensesPaidFor ExpensePaidFor[]
   userId          String?
   user            User?            @relation(fields: [userId], references: [id])
+
+  // A user is linked to at most one participant per group
+  @@unique([groupId, userId])
 }
 
 model Category {
@@ -136,14 +140,27 @@ enum ActivityType {
 }
 
 model User {
-  id              String        @id @default(uuid())
-  uniqueId        String        @unique
+  id              String   @id @default(uuid())
+  uniqueId        String   @unique
   displayName     String
-  email           String        @unique
+  email           String   @unique
   passwordHash    String
-  defaultCurrency String        @default("CAD")
-  createdAt       DateTime      @default(now())
-  
-  createdGroups   Group[]       @relation("GroupCreator")
-  participations  Participant[]
+  defaultCurrency String   @default("CAD")
+  createdAt       DateTime @default(now())
+
+  createdGroups    Group[]               @relation("GroupCreator")
+  participations   Participant[]
+  groupPreferences UserGroupPreference[]
+}
+
+// Per-user settings for a group (starred/archived in the groups list)
+model UserGroupPreference {
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId   String
+  group    Group   @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId  String
+  starred  Boolean @default(false)
+  archived Boolean @default(false)
+
+  @@id([userId, groupId])
 }

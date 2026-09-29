@@ -75,6 +75,19 @@
     "NotFound": {
       "text": "該群組不存在。",
       "link": "前往最近訪問的群組"
+    },
+    "Join": {
+      "loading": "Loading group…",
+      "title": "Join {name}",
+      "description": "Which one are you? Pick your name to join this group.",
+      "descriptionNoParticipants": "Join this group to see and add its expenses.",
+      "pickName": "Pick your name",
+      "joinAs": "Join as {name}",
+      "notListed": "I'm not listed, add me as {name}",
+      "addMe": "Join as {name}",
+      "notFoundTitle": "Group not found",
+      "notFoundDescription": "This group doesn't exist, or the link is incomplete. Ask a friend in the group to share its link again.",
+      "backToGroups": "Back to my groups"
     }
   },
   "GroupForm": {
@@ -101,7 +114,13 @@
       "add": "新增群組成員",
       "John": "林俊凱",
       "Jane": "陳怡婷",
-      "Jack": "張文傑"
+      "Jack": "張文傑",
+      "addFriend": "Add a friend",
+      "addFriendDescription": "Search your friend's Unique ID or name. They'll be added with their account and see the group in their groups right away.",
+      "searchPlaceholder": "Unique ID or name",
+      "searching": "Searching…",
+      "noResults": "No one found. Friends need an account first, or you can share the group link.",
+      "linked": "Linked to an account"
     },
     "Settings": {
       "title": "客製化設定",
@@ -297,9 +316,9 @@
   },
   "Share": {
     "title": "分享",
-    "description": "將此網址分享給其他人以加入群組並查看及新增消費紀錄",
+    "description": "To invite friends, share this link. They log in (or sign up) and pick their name to join the group.",
     "warning": "警告！",
-    "warningHelp": "任何有此連結的人都可以看到及編輯消費紀錄。請小心使用！"
+    "warningHelp": "Anyone who has this link and an account can join the group, then see and edit its expenses. Only share it with your friends."
   },
   "SchemaErrors": {
     "min1": "請輸入至少 1 個字。",

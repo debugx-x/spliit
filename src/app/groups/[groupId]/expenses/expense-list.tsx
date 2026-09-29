@@ -1,9 +1,9 @@
 'use client'
 import { ExpenseCard } from '@/app/groups/[groupId]/expenses/expense-card'
-import { getGroupExpensesAction } from '@/app/groups/[groupId]/expenses/expense-list-fetch-action'
 import { Button } from '@/components/ui/button'
 import { SearchBar } from '@/components/ui/search-bar'
 import { Skeleton } from '@/components/ui/skeleton'
+import type { getGroupExpenses } from '@/lib/api'
 import { getCurrencyFromGroup } from '@/lib/utils'
 import { trpc } from '@/trpc/client'
 import dayjs, { type Dayjs } from 'dayjs'
@@ -16,9 +16,7 @@ import { useCurrentGroup } from '../current-group-context'
 
 const PAGE_SIZE = 20
 
-type ExpensesType = NonNullable<
-  Awaited<ReturnType<typeof getGroupExpensesAction>>
->
+type ExpensesType = Awaited<ReturnType<typeof getGroupExpenses>>
 
 const EXPENSE_GROUPS = {
   UPCOMING: 'upcoming',

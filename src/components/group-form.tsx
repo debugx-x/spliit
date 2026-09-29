@@ -1,3 +1,4 @@
+import { AddFriendButton } from '@/components/add-friend-button'
 import { SubmitButton } from '@/components/submit-button'
 import { Button } from '@/components/ui/button'
 import {
@@ -35,7 +36,7 @@ import { getGroup } from '@/lib/api'
 import { defaultCurrencyList, getCurrency } from '@/lib/currency'
 import { GroupFormValues, groupFormSchema } from '@/lib/schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Save, Trash2 } from 'lucide-react'
+import { Save, Trash2, UserCheck } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -262,12 +263,23 @@ export function GroupForm({
                           Participant #{index + 1}
                         </FormLabel>
                         <FormControl>
-                          <div className="flex gap-2">
+                          <div className="flex gap-2 items-center">
                             <Input
                               className="text-base"
                               {...field}
                               placeholder={t('Participants.new')}
                             />
+                            {form.watch(`participants.${index}.userId`) && (
+                              <span
+                                title={t('Participants.linked')}
+                                className="flex-shrink-0 text-primary"
+                              >
+                                <UserCheck className="w-4 h-4" />
+                                <span className="sr-only">
+                                  {t('Participants.linked')}
+                                </span>
+                              </span>
+                            )}
                             {item.id &&
                             protectedParticipantIds.includes(item.id) ? (
                               <HoverCard>
@@ -310,7 +322,7 @@ export function GroupForm({
               ))}
             </ul>
           </CardContent>
-          <CardFooter>
+          <CardFooter className="flex flex-wrap gap-2">
             <Button
               variant="secondary"
               onClick={() => {
@@ -320,6 +332,21 @@ export function GroupForm({
             >
               {t('Participants.add')}
             </Button>
+            <AddFriendButton
+              excludedUserIds={form
+                .watch('participants')
+                .flatMap((p) => (p.userId ? [p.userId] : []))}
+              onAdd={(user) => {
+                // Same naming rule as joining: suffix the name if it's taken
+                const names = new Set(
+                  form.getValues('participants').map((p) => p.name),
+                )
+                const base = user.displayName.slice(0, 44)
+                let name = base
+                for (let i = 2; names.has(name); i++) name = `${base} (${i})`
+                append({ name, userId: user.id })
+              }}
+            />
           </CardFooter>
         </Card>
 

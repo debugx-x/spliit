@@ -1,3 +1,5 @@
+import { getSession } from '@/lib/auth'
+import { getMembership } from '@/lib/membership'
 import { prisma } from '@/lib/prisma'
 import contentDisposition from 'content-disposition'
 import { NextResponse } from 'next/server'
@@ -7,6 +9,14 @@ export async function GET(
   { params }: { params: Promise<{ groupId: string }> },
 ) {
   const { groupId } = await params
+  const session = await getSession()
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  const membership = await getMembership(groupId, session.userId)
+  if (!membership?.isMember) {
+    return NextResponse.json({ error: 'Group not found' }, { status: 404 })
+  }
   const group = await prisma.group.findUnique({
     where: { id: groupId },
     select: {

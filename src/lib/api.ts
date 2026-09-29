@@ -1,3 +1,4 @@
+import { assignParticipantLinks } from '@/lib/membership'
 import { prisma } from '@/lib/prisma'
 import { ExpenseFormValues, GroupFormValues } from '@/lib/schemas'
 import {
@@ -12,30 +13,15 @@ export function randomId() {
   return nanoid()
 }
 
-async function resolveParticipants(
-  participantsData: any[],
-  creatorId?: string,
-  creatorDisplayName?: string,
-) {
-  const names = participantsData.map((p) => p.name)
+// The subset of `userIds` that belong to existing users.
+async function getExistingUserIds(userIds: (string | null | undefined)[]) {
+  const ids = userIds.filter((id): id is string => !!id)
+  if (ids.length === 0) return new Set<string>()
   const users = await prisma.user.findMany({
-    where: {
-      OR: [{ uniqueId: { in: names } }, { displayName: { in: names } }],
-    },
+    where: { id: { in: ids } },
+    select: { id: true },
   })
-
-  return participantsData.map((p) => {
-    if (creatorId && p.name === creatorDisplayName) {
-      return { ...p, userId: creatorId }
-    }
-    const user = users.find(
-      (u) => u.uniqueId === p.name || u.displayName === p.name,
-    )
-    if (user) {
-      return { ...p, userId: user.id }
-    }
-    return p
-  })
+  return new Set(users.map((user) => user.id))
 }
 
 export async function createGroup(
@@ -43,6 +29,9 @@ export async function createGroup(
   creatorId?: string,
   creatorDisplayName?: string,
 ) {
+  const validUserIds = await getExistingUserIds(
+    groupFormValues.participants.map((p) => p.userId),
+  )
   return prisma.group.create({
     data: {
       id: randomId(),
@@ -53,13 +42,13 @@ export async function createGroup(
       creatorId,
       participants: {
         createMany: {
-          data: await resolveParticipants(
-            groupFormValues.participants.map(({ name }) => ({
+          data: assignParticipantLinks(
+            groupFormValues.participants.map(({ name, userId }) => ({
               id: randomId(),
               name,
+              userId,
             })),
-            creatorId,
-            creatorDisplayName,
+            { validUserIds, creatorId, creatorDisplayName },
           ),
         },
       },
@@ -150,10 +139,11 @@ export async function deleteExpense(
   participantId?: string,
 ) {
   const existingExpense = await getExpense(groupId, expenseId)
+  if (!existingExpense) throw new Error(`Invalid expense ID: ${expenseId}`)
   await logActivity(groupId, ActivityType.DELETE_EXPENSE, {
     participantId,
     expenseId,
-    data: existingExpense?.title,
+    data: existingExpense.title,
   })
 
   await prisma.expense.delete({
@@ -327,6 +317,15 @@ export async function updateGroup(
   const existingGroup = await getGroup(groupId)
   if (!existingGroup) throw new Error('Invalid group ID')
 
+  // Only new participants can be linked to an account here (friends added by
+  // Unique ID); existing participants' links are never changed by this form.
+  const newParticipants = groupFormValues.participants.filter(
+    (participant) => participant.id === undefined,
+  )
+  const validUserIds = await getExistingUserIds(
+    newParticipants.map((p) => p.userId),
+  )
+
   await logActivity(groupId, ActivityType.UPDATE_GROUP, { participantId })
 
   return prisma.group.update({
@@ -349,13 +348,20 @@ export async function updateGroup(
             },
           })),
         createMany: {
-          data: await resolveParticipants(
-            groupFormValues.participants
-              .filter((participant) => participant.id === undefined)
-              .map((participant) => ({
-                id: randomId(),
-                name: participant.name,
-              })),
+          data: assignParticipantLinks(
+            newParticipants.map(({ name, userId }) => ({
+              id: randomId(),
+              name,
+              userId,
+            })),
+            {
+              validUserIds,
+              // Includes participants removed in this same update: Prisma
+              // doesn't guarantee the removal runs before the creation.
+              alreadyLinkedUserIds: existingGroup.participants.flatMap((p) =>
+                p.userId ? [p.userId] : [],
+              ),
+            },
           ),
         },
       },
@@ -415,8 +421,9 @@ export async function getGroupExpenseCount(groupId: string) {
 }
 
 export async function getExpense(groupId: string, expenseId: string) {
-  return prisma.expense.findUnique({
-    where: { id: expenseId },
+  // Scoped to the group: access checks are done per group
+  return prisma.expense.findFirst({
+    where: { id: expenseId, groupId },
     include: {
       paidBy: true,
       paidFor: true,
