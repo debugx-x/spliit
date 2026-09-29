@@ -148,9 +148,23 @@ model User {
   defaultCurrency String   @default("CAD")
   createdAt       DateTime @default(now())
 
-  createdGroups    Group[]               @relation("GroupCreator")
-  participations   Participant[]
-  groupPreferences UserGroupPreference[]
+  createdGroups       Group[]               @relation("GroupCreator")
+  participations      Participant[]
+  groupPreferences    UserGroupPreference[]
+  passwordResetTokens PasswordResetToken[]
+}
+
+// One-time password reset links. Only a SHA-256 hash of the token is stored.
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, createdAt])
 }
 
 // Per-user settings for a group (starred/archived in the groups list)

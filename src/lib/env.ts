@@ -38,6 +38,10 @@ const envSchema = z
       z.boolean().default(false),
     ),
     OPENAI_API_KEY: z.string().optional(),
+    // Outgoing email (password reset links), e.g. Gmail with an app password:
+    // smtps://you%40gmail.com:<app-password>@smtp.gmail.com:465
+    SMTP_URL: z.string().url().optional(),
+    EMAIL_FROM: z.string().optional(),
   })
   .superRefine((env, ctx) => {
     if (

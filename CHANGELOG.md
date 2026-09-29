@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - Joining a group through its link: logged-in users pick their participant name (or add themselves) to become a member.
 - "My groups" lists the groups you created or joined, from your account, on any device. Starred and archived groups are saved to your account.
 - Nightly encrypted database backups (see README "Backups").
+- "Forgot password?": a one-time reset link (valid 1 hour) sent by email through any SMTP server, e.g. Gmail (see README "Password reset emails").
 
 ### Changed
 - Creating or editing groups and expenses requires being logged in; logged-out users are redirected to the login page and brought back afterwards.
