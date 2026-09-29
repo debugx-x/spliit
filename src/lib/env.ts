@@ -8,6 +8,9 @@ const interpretEnvVarAsBool = (val: unknown): boolean => {
 const envSchema = z
   .object({
     POSTGRES_URL: z.string().url(),
+    JWT_SECRET: z
+      .string()
+      .min(32, 'JWT_SECRET must be at least 32 characters long'),
     NEXT_PUBLIC_BASE_URL: z
       .string()
       .optional()

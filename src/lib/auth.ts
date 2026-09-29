@@ -1,8 +1,8 @@
 import { jwtVerify, SignJWT } from 'jose';
 import { cookies } from 'next/headers';
+import { env } from '@/lib/env';
 
-const SECRET_KEY = process.env.JWT_SECRET || 'super-secret-key-for-spliit-local-dev';
-const key = new TextEncoder().encode(SECRET_KEY);
+const key = new TextEncoder().encode(env.JWT_SECRET);
 
 export type SessionPayload = {
   userId: string;
