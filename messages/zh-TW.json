@@ -8,7 +8,8 @@
     }
   },
   "Header": {
-    "groups": "群組"
+    "groups": "群組",
+    "friends": "Friends"
   },
   "Footer": {
     "madeIn": "來自 🇨🇦 加拿大魁北克蒙特婁",
@@ -404,5 +405,21 @@
       "TV/Phone/Internet": "電視/電話/網路",
       "Water": "水費"
     }
+  },
+  "Friends": {
+    "title": "Friends",
+    "loading": "Loading balances…",
+    "overall": "Overall",
+    "owedToYouTotal": "You're owed {amount}",
+    "youOweTotal": "you owe {amount}",
+    "allSettled": "You're all settled up.",
+    "seeByFriend": "See by friend →",
+    "owesYou": "owes you {amount}",
+    "youOwe": "you owe {amount}",
+    "settledUp": "Settled up",
+    "settledTitle": "Settled up",
+    "inGroup": "in {group}",
+    "empty": "No balances with anyone yet. Add expenses in a group to see who owes whom.",
+    "goToGroups": "Go to your groups"
   }
 }

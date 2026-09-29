@@ -8,7 +8,8 @@
     }
   },
   "Header": {
-    "groups": "Gruppi"
+    "groups": "Gruppi",
+    "friends": "Friends"
   },
   "Footer": {
     "madeIn": "Realizzato a Montréal, Québec 🇨🇦",
@@ -428,5 +429,21 @@
       "TV/Phone/Internet": "TV/Telefono/Internet",
       "Water": "Acqua"
     }
+  },
+  "Friends": {
+    "title": "Friends",
+    "loading": "Loading balances…",
+    "overall": "Overall",
+    "owedToYouTotal": "You're owed {amount}",
+    "youOweTotal": "you owe {amount}",
+    "allSettled": "You're all settled up.",
+    "seeByFriend": "See by friend →",
+    "owesYou": "owes you {amount}",
+    "youOwe": "you owe {amount}",
+    "settledUp": "Settled up",
+    "settledTitle": "Settled up",
+    "inGroup": "in {group}",
+    "empty": "No balances with anyone yet. Add expenses in a group to see who owes whom.",
+    "goToGroups": "Go to your groups"
   }
 }

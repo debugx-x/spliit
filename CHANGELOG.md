@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - Joining a group through its link: logged-in users pick their participant name (or add themselves) to become a member.
 - "My groups" lists the groups you created or joined, from your account, on any device. Starred and archived groups are saved to your account.
 - Nightly encrypted database backups (see README "Backups").
+- Friends view (/friends): what each friend owes you, or you owe them, across all your groups, per currency, with a per-group breakdown. "My groups" shows your overall totals.
 
 ### Changed
 - Creating or editing groups and expenses requires being logged in; logged-out users are redirected to the login page and brought back afterwards.

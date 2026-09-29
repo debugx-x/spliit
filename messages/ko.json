@@ -337,7 +337,8 @@
     "description": "<strong>Splitsville</strong>와 함께하는 새 시작을 환영해요!"
   },
   "Header": {
-    "groups": "그룹"
+    "groups": "그룹",
+    "friends": "Friends"
   },
   "Footer": {
     "madeIn": "몬트리올, 퀘벡에서 제작 🇨🇦",
@@ -403,5 +404,21 @@
     "other": {
       "heading": "그 외 통화"
     }
+  },
+  "Friends": {
+    "title": "Friends",
+    "loading": "Loading balances…",
+    "overall": "Overall",
+    "owedToYouTotal": "You're owed {amount}",
+    "youOweTotal": "you owe {amount}",
+    "allSettled": "You're all settled up.",
+    "seeByFriend": "See by friend →",
+    "owesYou": "owes you {amount}",
+    "youOwe": "you owe {amount}",
+    "settledUp": "Settled up",
+    "settledTitle": "Settled up",
+    "inGroup": "in {group}",
+    "empty": "No balances with anyone yet. Add expenses in a group to see who owes whom.",
+    "goToGroups": "Go to your groups"
   }
 }

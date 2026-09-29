@@ -8,7 +8,8 @@
     }
   },
   "Header": {
-    "groups": "Gruplar"
+    "groups": "Gruplar",
+    "friends": "Friends"
   },
   "Footer": {
     "madeIn": "Montréal, Québec 🇨🇦'da yapıldı",
@@ -404,5 +405,21 @@
       "TV/Phone/Internet": "TV/Telefon/İnternet",
       "Water": "Su"
     }
+  },
+  "Friends": {
+    "title": "Friends",
+    "loading": "Loading balances…",
+    "overall": "Overall",
+    "owedToYouTotal": "You're owed {amount}",
+    "youOweTotal": "you owe {amount}",
+    "allSettled": "You're all settled up.",
+    "seeByFriend": "See by friend →",
+    "owesYou": "owes you {amount}",
+    "youOwe": "you owe {amount}",
+    "settledUp": "Settled up",
+    "settledTitle": "Settled up",
+    "inGroup": "in {group}",
+    "empty": "No balances with anyone yet. Add expenses in a group to see who owes whom.",
+    "goToGroups": "Go to your groups"
   }
 }
