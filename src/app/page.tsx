@@ -1,12 +1,12 @@
 import { Button } from '@/components/ui/button'
+import { getSession } from '@/lib/auth'
 import { getTranslations } from 'next-intl/server'
 import Link from 'next/link'
-import { getSession } from '@/lib/auth'
 
 export default async function HomePage() {
   const t = await getTranslations()
   const session = await getSession()
-  
+
   return (
     <main>
       <section className="py-16 md:py-24 lg:py-32">
