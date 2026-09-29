@@ -14,6 +14,8 @@ All notable changes to this project will be documented in this file.
 - Settle up with Interac: "Pay with Interac" on your own suggested reimbursements shows the friend's Interac email, the amount and a message to copy into your bank app, then records the payment in one tap. Each user has an editable "Interac e-Transfer email" in their profile (starting as their account email); it's the only email other members see.
 
 ### Changed
+- Renamed the app to **Split Karega** (page titles, installed app name, share and export texts, homepage).
+- New Split Karega logo pack: a coin split in two, on green. SVG masters in `public/brand/`; `npm run generate-logos` renders the favicon, app icons (including maskable and Apple touch icon), header logo, iOS splash and social banner from them.
 - Creating or editing groups and expenses requires being logged in; logged-out users are redirected to the login page and brought back afterwards.
 - The database connection is configured with a single `POSTGRES_URL` variable (replacing `POSTGRES_PRISMA_URL` and `POSTGRES_URL_NON_POOLING`).
 - `JWT_SECRET` (at least 32 characters) is now a required environment variable.

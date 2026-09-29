@@ -1,7 +1,7 @@
 {
   "Homepage": {
     "title": "Share <strong>Expenses</strong> with <strong>Friends & Family</strong>",
-    "description": "Welcome to your new <strong>Splitsville</strong> instance !",
+    "description": "<strong>Split karega?</strong> Keep track of who paid and who owes whom in your friend group. Free, with no limits.",
     "button": {
       "groups": "Go to groups",
       "github": "GitHub"
@@ -327,7 +327,7 @@
       "email": "Interac email",
       "amount": "Amount",
       "message": "Message (optional)",
-      "messageText": "Splitsville · {group}",
+      "messageText": "Split Karega · {group}",
       "cancel": "Cancel",
       "sent": "I've sent it",
       "recordedTitle": "Payment recorded",
