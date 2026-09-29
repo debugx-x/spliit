@@ -1,13 +1,20 @@
 'use client'
 
-import { Suspense, useActionState } from 'react'
-import { useSearchParams } from 'next/navigation'
-import { registerAction } from '../actions'
 import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+import { Suspense, useActionState } from 'react'
+import { registerAction } from '../actions'
 
 export default function RegisterPage() {
   return (
@@ -26,7 +33,9 @@ function RegisterForm() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl">Create an Account</CardTitle>
-          <CardDescription>Enter your information to join your friend group.</CardDescription>
+          <CardDescription>
+            Enter your information to join your friend group.
+          </CardDescription>
         </CardHeader>
         <form action={formAction}>
           <input type="hidden" name="next" value={next} />
@@ -39,17 +48,36 @@ function RegisterForm() {
 
             <div className="space-y-2">
               <Label htmlFor="displayName">Display Name</Label>
-              <Input id="displayName" name="displayName" placeholder="John Doe" defaultValue={state?.values?.displayName} required />
+              <Input
+                id="displayName"
+                name="displayName"
+                placeholder="John Doe"
+                defaultValue={state?.values?.displayName}
+                required
+              />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="uniqueId">Unique ID</Label>
-              <Input id="uniqueId" name="uniqueId" placeholder="johndoe123" defaultValue={state?.values?.uniqueId} required />
+              <Input
+                id="uniqueId"
+                name="uniqueId"
+                placeholder="johndoe123"
+                defaultValue={state?.values?.uniqueId}
+                required
+              />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="email">Email (For Interac)</Label>
-              <Input id="email" name="email" type="email" placeholder="john@example.com" defaultValue={state?.values?.email} required />
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="john@example.com"
+                defaultValue={state?.values?.email}
+                required
+              />
             </div>
 
             <div className="space-y-2">
@@ -64,7 +92,9 @@ function RegisterForm() {
             <div className="text-sm text-center text-muted-foreground">
               Already have an account?{' '}
               <Link
-                href={next ? `/login?next=${encodeURIComponent(next)}` : '/login'}
+                href={
+                  next ? `/login?next=${encodeURIComponent(next)}` : '/login'
+                }
                 className="underline hover:text-primary"
               >
                 Login

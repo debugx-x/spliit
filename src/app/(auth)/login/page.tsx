@@ -1,13 +1,20 @@
 'use client'
 
-import { Suspense, useActionState } from 'react'
-import { useSearchParams } from 'next/navigation'
-import { loginAction } from '../actions'
 import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+import { Suspense, useActionState } from 'react'
+import { loginAction } from '../actions'
 
 export default function LoginPage() {
   return (
@@ -26,7 +33,9 @@ function LoginForm() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>Enter your credentials to access your account.</CardDescription>
+          <CardDescription>
+            Enter your credentials to access your account.
+          </CardDescription>
         </CardHeader>
         <form action={formAction}>
           <input type="hidden" name="next" value={next} />
@@ -39,7 +48,13 @@ function LoginForm() {
 
             <div className="space-y-2">
               <Label htmlFor="uniqueId">Unique ID or Email</Label>
-              <Input id="uniqueId" name="uniqueId" placeholder="johndoe123" defaultValue={state?.values?.uniqueId} required />
+              <Input
+                id="uniqueId"
+                name="uniqueId"
+                placeholder="johndoe123"
+                defaultValue={state?.values?.uniqueId}
+                required
+              />
             </div>
 
             <div className="space-y-2">
@@ -54,7 +69,11 @@ function LoginForm() {
             <div className="text-sm text-center text-muted-foreground">
               Don&apos;t have an account?{' '}
               <Link
-                href={next ? `/register?next=${encodeURIComponent(next)}` : '/register'}
+                href={
+                  next
+                    ? `/register?next=${encodeURIComponent(next)}`
+                    : '/register'
+                }
                 className="underline hover:text-primary"
               >
                 Create one

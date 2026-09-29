@@ -1,8 +1,8 @@
 import { updateGroup } from '@/lib/api'
 import { groupFormSchema } from '@/lib/schemas'
 import { baseProcedure } from '@/trpc/init'
-import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
+import { z } from 'zod'
 
 export const updateGroupProcedure = baseProcedure
   .input(
@@ -12,9 +12,11 @@ export const updateGroupProcedure = baseProcedure
       participantId: z.string().optional(),
     }),
   )
-  .mutation(async ({ input: { groupId, groupFormValues, participantId }, ctx }) => {
-    if (!ctx.session?.userId) {
-      throw new TRPCError({ code: 'UNAUTHORIZED' })
-    }
-    await updateGroup(groupId, groupFormValues, participantId)
-  })
+  .mutation(
+    async ({ input: { groupId, groupFormValues, participantId }, ctx }) => {
+      if (!ctx.session?.userId) {
+        throw new TRPCError({ code: 'UNAUTHORIZED' })
+      }
+      await updateGroup(groupId, groupFormValues, participantId)
+    },
+  )

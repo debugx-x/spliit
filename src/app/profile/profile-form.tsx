@@ -1,14 +1,24 @@
 'use client'
 
-import { useActionState } from 'react'
-import { updateProfileAction, logoutAction } from './actions'
 import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { useActionState } from 'react'
+import { logoutAction, updateProfileAction } from './actions'
 
 export function ProfileForm({ user }: { user: any }) {
-  const [state, formAction, isPending] = useActionState(updateProfileAction, null)
+  const [state, formAction, isPending] = useActionState(
+    updateProfileAction,
+    null,
+  )
 
   return (
     <div className="space-y-8">
@@ -29,26 +39,51 @@ export function ProfileForm({ user }: { user: any }) {
                 {state.success}
               </div>
             )}
-            
+
             <div className="space-y-2">
               <Label htmlFor="displayName">Display Name</Label>
-              <Input id="displayName" name="displayName" defaultValue={user.displayName} required />
+              <Input
+                id="displayName"
+                name="displayName"
+                defaultValue={user.displayName}
+                required
+              />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="uniqueId">Unique ID</Label>
-              <Input id="uniqueId" name="uniqueId" defaultValue={user.uniqueId} disabled className="bg-slate-100" />
-              <p className="text-xs text-muted-foreground">Your Unique ID cannot be changed.</p>
+              <Input
+                id="uniqueId"
+                name="uniqueId"
+                defaultValue={user.uniqueId}
+                disabled
+                className="bg-slate-100"
+              />
+              <p className="text-xs text-muted-foreground">
+                Your Unique ID cannot be changed.
+              </p>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" name="email" type="email" defaultValue={user.email} required />
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                defaultValue={user.email}
+                required
+              />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="defaultCurrency">Default Currency</Label>
-              <Input id="defaultCurrency" name="defaultCurrency" defaultValue={user.defaultCurrency} maxLength={3} required />
+              <Input
+                id="defaultCurrency"
+                name="defaultCurrency"
+                defaultValue={user.defaultCurrency}
+                maxLength={3}
+                required
+              />
             </div>
           </CardContent>
           <CardFooter>
@@ -58,14 +93,16 @@ export function ProfileForm({ user }: { user: any }) {
           </CardFooter>
         </form>
       </Card>
-      
+
       <Card className="border-red-200">
         <CardHeader>
           <CardTitle className="text-red-600">Danger Zone</CardTitle>
         </CardHeader>
         <CardContent>
           <form action={logoutAction}>
-            <Button variant="destructive" type="submit">Log Out</Button>
+            <Button variant="destructive" type="submit">
+              Log Out
+            </Button>
           </form>
         </CardContent>
       </Card>

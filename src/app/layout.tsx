@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/components/theme-provider'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { Button } from '@/components/ui/button'
 import { Toaster } from '@/components/ui/toaster'
+import { getSession } from '@/lib/auth'
 import { env } from '@/lib/env'
 import { TRPCProvider } from '@/trpc/client'
 import type { Metadata, Viewport } from 'next'
@@ -13,7 +14,6 @@ import { getLocale, getMessages } from 'next-intl/server'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Suspense } from 'react'
-import { getSession } from '@/lib/auth'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -64,7 +64,13 @@ export const viewport: Viewport = {
   themeColor: '#047857',
 }
 
-function Content({ children, session }: { children: React.ReactNode, session: any }) {
+function Content({
+  children,
+  session,
+}: {
+  children: React.ReactNode
+  session: any
+}) {
   const t = useTranslations()
   return (
     <TRPCProvider>

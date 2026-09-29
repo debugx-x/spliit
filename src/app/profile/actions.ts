@@ -1,8 +1,8 @@
 'use server'
 
-import { z } from 'zod'
+import { createSession, getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { getSession, createSession } from '@/lib/auth'
+import { z } from 'zod'
 
 const profileSchema = z.object({
   displayName: z.string().min(2, 'Display name must be at least 2 characters'),

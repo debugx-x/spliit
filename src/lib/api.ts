@@ -12,22 +12,25 @@ export function randomId() {
   return nanoid()
 }
 
-async function resolveParticipants(participantsData: any[], creatorId?: string, creatorDisplayName?: string) {
-  const names = participantsData.map(p => p.name)
+async function resolveParticipants(
+  participantsData: any[],
+  creatorId?: string,
+  creatorDisplayName?: string,
+) {
+  const names = participantsData.map((p) => p.name)
   const users = await prisma.user.findMany({
     where: {
-      OR: [
-        { uniqueId: { in: names } },
-        { displayName: { in: names } }
-      ]
-    }
+      OR: [{ uniqueId: { in: names } }, { displayName: { in: names } }],
+    },
   })
 
-  return participantsData.map(p => {
+  return participantsData.map((p) => {
     if (creatorId && p.name === creatorDisplayName) {
       return { ...p, userId: creatorId }
     }
-    const user = users.find(u => u.uniqueId === p.name || u.displayName === p.name)
+    const user = users.find(
+      (u) => u.uniqueId === p.name || u.displayName === p.name,
+    )
     if (user) {
       return { ...p, userId: user.id }
     }
@@ -35,7 +38,11 @@ async function resolveParticipants(participantsData: any[], creatorId?: string, 
   })
 }
 
-export async function createGroup(groupFormValues: GroupFormValues, creatorId?: string, creatorDisplayName?: string) {
+export async function createGroup(
+  groupFormValues: GroupFormValues,
+  creatorId?: string,
+  creatorDisplayName?: string,
+) {
   return prisma.group.create({
     data: {
       id: randomId(),
@@ -46,10 +53,14 @@ export async function createGroup(groupFormValues: GroupFormValues, creatorId?: 
       creatorId,
       participants: {
         createMany: {
-          data: await resolveParticipants(groupFormValues.participants.map(({ name }) => ({
-            id: randomId(),
-            name,
-          })), creatorId, creatorDisplayName),
+          data: await resolveParticipants(
+            groupFormValues.participants.map(({ name }) => ({
+              id: randomId(),
+              name,
+            })),
+            creatorId,
+            creatorDisplayName,
+          ),
         },
       },
     },
@@ -338,12 +349,14 @@ export async function updateGroup(
             },
           })),
         createMany: {
-          data: await resolveParticipants(groupFormValues.participants
-            .filter((participant) => participant.id === undefined)
-            .map((participant) => ({
-              id: randomId(),
-              name: participant.name,
-            }))),
+          data: await resolveParticipants(
+            groupFormValues.participants
+              .filter((participant) => participant.id === undefined)
+              .map((participant) => ({
+                id: randomId(),
+                name: participant.name,
+              })),
+          ),
         },
       },
     },
@@ -389,9 +402,7 @@ export async function getGroupExpenses(
     },
     where: {
       groupId,
-      title: options?.filter
-        ? { contains: options.filter }
-        : undefined,
+      title: options?.filter ? { contains: options.filter } : undefined,
     },
     orderBy: [{ expenseDate: 'desc' }, { createdAt: 'desc' }],
     skip: options && options.offset,

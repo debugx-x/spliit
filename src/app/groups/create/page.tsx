@@ -1,7 +1,7 @@
 import { CreateGroup } from '@/app/groups/create/create-group'
-import { Metadata } from 'next'
 import { requireSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Create Group',
