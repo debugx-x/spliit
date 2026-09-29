@@ -5,6 +5,7 @@ on:
     branches: ['main']
   pull_request:
     branches: ['main']
+  workflow_dispatch:
 
 jobs:
   checks:
@@ -34,3 +35,6 @@ jobs:
 
       - name: Check Prettier formatting
         run: npm run check-formatting
+
+      - name: Run tests
+        run: npm test
