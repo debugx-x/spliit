@@ -1,0 +1,62 @@
+name: Database backup
+
+# Nightly encrypted pg_dump of the production database, kept as a
+# workflow artifact for 30 days. The repo is public, so the dump is
+# encrypted with BACKUP_PASSPHRASE before upload. See README "Backups".
+
+on:
+  schedule:
+    - cron: '17 8 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: db-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check secrets
+        env:
+          BACKUP_DATABASE_URL: ${{ secrets.BACKUP_DATABASE_URL }}
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          missing=0
+          [ -n "$BACKUP_DATABASE_URL" ] || { echo "::error::Repository secret BACKUP_DATABASE_URL is not set"; missing=1; }
+          [ -n "$BACKUP_PASSPHRASE" ] || { echo "::error::Repository secret BACKUP_PASSPHRASE is not set"; missing=1; }
+          exit $missing
+
+      - name: Dump database
+        env:
+          BACKUP_DATABASE_URL: ${{ secrets.BACKUP_DATABASE_URL }}
+        run: |
+          # A newer pg_dump can dump older servers, so use the latest image.
+          docker run --rm -e BACKUP_DATABASE_URL postgres:latest \
+            sh -c 'pg_dump --no-owner --no-privileges --format=custom "$BACKUP_DATABASE_URL"' \
+            > backup.dump
+          test -s backup.dump
+          echo "Dump size: $(du -h backup.dump | cut -f1)"
+
+      - name: Encrypt dump
+        env:
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          echo "BACKUP_NAME=db-backup-$(date -u +%Y-%m-%dT%H%MZ)" >> "$GITHUB_ENV"
+          gpg --batch --yes --pinentry-mode loopback --passphrase-fd 3 \
+            --symmetric --cipher-algo AES256 \
+            --output backup.dump.gpg backup.dump 3<<< "$BACKUP_PASSPHRASE"
+          rm backup.dump
+
+      - name: Upload encrypted backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.BACKUP_NAME }}
+          path: backup.dump.gpg
+          retention-days: 30
+          if-no-files-found: error
