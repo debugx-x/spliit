@@ -18,15 +18,15 @@ import './globals.css'
 export const metadata: Metadata = {
   metadataBase: new URL(env.NEXT_PUBLIC_BASE_URL),
   title: {
-    default: 'Splitsville · Money Please',
-    template: '%s · Splitsville',
+    default: 'Split Karega · Money Please',
+    template: '%s · Split Karega',
   },
   description:
-    'Splitsville is a minimalist web application to split expenses with friends and family. No ads, no account, no problem.',
+    'Split Karega is a free, minimalist web app to split expenses with your friends. No ads, no limits.',
   openGraph: {
-    title: 'Splitsville · Money Please',
+    title: 'Split Karega · Money Please',
     description:
-      'Splitsville is a minimalist web application to split expenses with friends and family. No ads, no account, no problem.',
+      'Split Karega is a free, minimalist web app to split expenses with your friends. No ads, no limits.',
     images: `/banner.png`,
     type: 'website',
     url: '/',
@@ -36,15 +36,15 @@ export const metadata: Metadata = {
     creator: '@scastiel',
     site: '@scastiel',
     images: `/banner.png`,
-    title: 'Splitsville · Money Please',
+    title: 'Split Karega · Money Please',
     description:
-      'Splitsville is a minimalist web application to split expenses with friends and family. No ads, no account, no problem.',
+      'Split Karega is a free, minimalist web app to split expenses with your friends. No ads, no limits.',
   },
   appleWebApp: {
     capable: true,
-    title: 'Splitsville',
+    title: 'Split Karega',
   },
-  applicationName: 'Splitsville',
+  applicationName: 'Split Karega',
   icons: [
     {
       url: '/android-chrome-192x192.png',
@@ -84,7 +84,7 @@ function Content({
               className="m-1 h-auto w-auto rounded-lg"
               width={35}
               height={35}
-              alt="Splitsville"
+              alt="Split Karega"
             />
           </h1>
         </Link>

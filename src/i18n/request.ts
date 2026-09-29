@@ -1,6 +1,6 @@
 import { getRequestConfig } from 'next-intl/server'
 
-// Splitsville is English-only: the app is used by one English-speaking
+// Split Karega is English-only: the app is used by one English-speaking
 // friend group. To add a language back, add its messages/<locale>.json file,
 // list it here and pick the locale per request again.
 export const localeLabels = {

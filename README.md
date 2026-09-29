@@ -45,7 +45,7 @@ If you want to contribute financially and help us keep the application free and 
 
 ### Language
 
-Splitsville is English-only (`messages/en-US.json`). Upstream Spliit's translations were removed because the new screens (accounts, groups membership, friends, Interac) exist only in English. To add a language back, add `messages/<locale>.json` and list the locale in `src/i18n/request.ts`.
+Split Karega is English-only (`messages/en-US.json`). Upstream Spliit's translations were removed because the new screens (accounts, groups membership, friends, Interac) exist only in English. To add a language back, add `messages/<locale>.json` and list the locale in `src/i18n/request.ts`.
 
 ## Run locally
 

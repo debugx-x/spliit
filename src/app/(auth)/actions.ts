@@ -89,7 +89,8 @@ const loginSchema = z.object({
 })
 
 // The client's IP address for rate limiting. On Vercel these headers are set
-// by the platform; without them (e.g. locally) only per-account limits apply.
+// by the platform (locally, Next.js sets x-forwarded-for to the loopback
+// address). Without them, only per-account limits apply.
 async function getClientIp() {
   const requestHeaders = await headers()
   return (
