@@ -54,7 +54,10 @@ export function AddFriendButton({
       open={open}
       onOpenChange={(value) => {
         setOpen(value)
-        if (!value) setQuery('')
+        if (!value) {
+          setQuery('')
+          setResults(null)
+        }
       }}
     >
       <PopoverTrigger asChild>
@@ -95,6 +98,7 @@ export function AddFriendButton({
                     onAdd(user)
                     setOpen(false)
                     setQuery('')
+                    setResults(null)
                   }}
                 >
                   <span className="truncate">{user.displayName}</span>
