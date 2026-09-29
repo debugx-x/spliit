@@ -272,6 +272,21 @@
       "noImbursements": "看起來你的群組目前不需要銷帳😁",
       "owes": "<strong>{from}</strong> 欠 <strong>{to}</strong>",
       "markAsPaid": "標記為已支付"
+    },
+    "Interac": {
+      "button": "Pay with Interac",
+      "title": "Send {amount} to {name}",
+      "description": "Send an Interac e-Transfer from your bank's app with these details, then tap \"I've sent it\" to record the payment.",
+      "email": "Interac email",
+      "amount": "Amount",
+      "message": "Message (optional)",
+      "messageText": "Splitsville · {group}",
+      "cancel": "Cancel",
+      "sent": "I've sent it",
+      "recordedTitle": "Payment recorded",
+      "recordedDescription": "{amount} to {name}",
+      "error": "Couldn't record the payment. Please try again.",
+      "expenseTitle": "Interac e-Transfer"
     }
   },
   "Stats": {
@@ -420,6 +435,7 @@
     "settledTitle": "Settled up",
     "inGroup": "in {group}",
     "empty": "No balances with anyone yet. Add expenses in a group to see who owes whom.",
-    "goToGroups": "Go to your groups"
+    "goToGroups": "Go to your groups",
+    "pay": "Pay"
   }
 }

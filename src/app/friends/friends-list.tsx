@@ -138,14 +138,23 @@ function FriendCard({ friend }: { friend: Friend }) {
                     {line.groupName}
                   </Link>
                 </Button>
-                <span
-                  className={
-                    line.amount > 0 ? 'text-green-600' : 'text-red-600'
-                  }
-                >
-                  {line.amount > 0
-                    ? t('owesYou', { amount: format(line) })
-                    : t('youOwe', { amount: format(line) })}
+                <span className="flex items-center gap-3">
+                  <span
+                    className={
+                      line.amount > 0 ? 'text-green-600' : 'text-red-600'
+                    }
+                  >
+                    {line.amount > 0
+                      ? t('owesYou', { amount: format(line) })
+                      : t('youOwe', { amount: format(line) })}
+                  </span>
+                  {line.amount < 0 && (
+                    <Button asChild size="sm" variant="secondary">
+                      <Link href={`/groups/${line.groupId}/balances`}>
+                        {t('pay')}
+                      </Link>
+                    </Button>
+                  )}
                 </span>
               </li>
             ))}
