@@ -13,7 +13,7 @@ datasource db {
 model Group {
   id           String        @id
   name         String
-  information  String?
+  information  String?       @db.Text
   currency     String        @default("$")
   currencyCode String?
   participants Participant[]
@@ -45,7 +45,7 @@ model Category {
 model Expense {
   id               String            @id
   group            Group             @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  expenseDate      DateTime          @default(now())
+  expenseDate      DateTime          @default(dbgenerated("CURRENT_DATE")) @db.Date
   title            String
   category         Category?         @relation(fields: [categoryId], references: [id])
   categoryId       Int               @default(0)
