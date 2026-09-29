@@ -8,7 +8,8 @@
     }
   },
   "Header": {
-    "groups": "Skupiny"
+    "groups": "Skupiny",
+    "friends": "Friends"
   },
   "Footer": {
     "madeIn": "Vyrobeno v Montréalu, Québec 🇨🇦",
@@ -414,5 +415,21 @@
       "TV/Phone/Internet": "TV/Telefon/Internet",
       "Water": "Voda"
     }
+  },
+  "Friends": {
+    "title": "Friends",
+    "loading": "Loading balances…",
+    "overall": "Overall",
+    "owedToYouTotal": "You're owed {amount}",
+    "youOweTotal": "you owe {amount}",
+    "allSettled": "You're all settled up.",
+    "seeByFriend": "See by friend →",
+    "owesYou": "owes you {amount}",
+    "youOwe": "you owe {amount}",
+    "settledUp": "Settled up",
+    "settledTitle": "Settled up",
+    "inGroup": "in {group}",
+    "empty": "No balances with anyone yet. Add expenses in a group to see who owes whom.",
+    "goToGroups": "Go to your groups"
   }
 }

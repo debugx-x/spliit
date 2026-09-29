@@ -100,6 +100,18 @@ function Content({
                 <Link href="/groups">{t('Header.groups')}</Link>
               </Button>
             </li>
+            {session && (
+              <li>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  asChild
+                  className="-my-3 text-primary"
+                >
+                  <Link href="/friends">{t('Header.friends')}</Link>
+                </Button>
+              </li>
+            )}
             {session ? (
               <li>
                 <Button

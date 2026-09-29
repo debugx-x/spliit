@@ -8,7 +8,8 @@
     }
   },
   "Header": {
-    "groups": "群组"
+    "groups": "群组",
+    "friends": "Friends"
   },
   "Footer": {
     "madeIn": "Made in Montréal, Québec 🇨🇦",
@@ -458,5 +459,21 @@
     "other": {
       "heading": "其他币种"
     }
+  },
+  "Friends": {
+    "title": "Friends",
+    "loading": "Loading balances…",
+    "overall": "Overall",
+    "owedToYouTotal": "You're owed {amount}",
+    "youOweTotal": "you owe {amount}",
+    "allSettled": "You're all settled up.",
+    "seeByFriend": "See by friend →",
+    "owesYou": "owes you {amount}",
+    "youOwe": "you owe {amount}",
+    "settledUp": "Settled up",
+    "settledTitle": "Settled up",
+    "inGroup": "in {group}",
+    "empty": "No balances with anyone yet. Add expenses in a group to see who owes whom.",
+    "goToGroups": "Go to your groups"
   }
 }
