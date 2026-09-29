@@ -1,7 +1,7 @@
 import { deleteExpense } from '@/lib/api'
 import { baseProcedure } from '@/trpc/init'
-import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
+import { z } from 'zod'
 
 export const deleteGroupExpenseProcedure = baseProcedure
   .input(

@@ -75,16 +75,21 @@ export function GroupForm({
           name: '',
           information: '',
           currency: '',
-          currencyCode: session?.defaultCurrency || process.env.NEXT_PUBLIC_DEFAULT_CURRENCY_CODE || 'CAD',
-          participants: session ? [
-            { name: session.displayName },
-            { name: t('Participants.Jane') },
-            { name: t('Participants.Jack') },
-          ] : [
-            { name: t('Participants.John') },
-            { name: t('Participants.Jane') },
-            { name: t('Participants.Jack') },
-          ],
+          currencyCode:
+            session?.defaultCurrency ||
+            process.env.NEXT_PUBLIC_DEFAULT_CURRENCY_CODE ||
+            'CAD',
+          participants: session
+            ? [
+                { name: session.displayName },
+                { name: t('Participants.Jane') },
+                { name: t('Participants.Jack') },
+              ]
+            : [
+                { name: t('Participants.John') },
+                { name: t('Participants.Jane') },
+                { name: t('Participants.Jack') },
+              ],
         },
   })
   const { fields, append, remove } = useFieldArray({

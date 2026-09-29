@@ -14,7 +14,7 @@ Implement a full session-based authentication system and user profile management
 
 **Primary Dependencies**: Next.js App Router, Prisma ORM, `bcryptjs` (password hashing), `jose` (JWT), TailwindCSS, Shadcn UI
 
-**Storage**: SQLite (via Prisma)
+**Storage**: PostgreSQL (via Prisma; migrations in `prisma/migrations`)
 
 **Testing**: Jest (Unit), Playwright (E2E) (NEEDS CLARIFICATION)
 

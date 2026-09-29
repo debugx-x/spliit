@@ -1,13 +1,12 @@
 import { Button } from '@/components/ui/button'
-import { Github } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { getSession } from '@/lib/auth'
+import { getTranslations } from 'next-intl/server'
 import Link from 'next/link'
 
-// FIX for https://github.com/vercel/next.js/issues/58615
-// export const dynamic = 'force-dynamic'
+export default async function HomePage() {
+  const t = await getTranslations()
+  const session = await getSession()
 
-export default function HomePage() {
-  const t = useTranslations()
   return (
     <main>
       <section className="py-16 md:py-24 lg:py-32">
@@ -23,15 +22,25 @@ export default function HomePage() {
             })}
           </p>
           <div className="flex gap-2">
-            <Button asChild>
-              <Link href="/groups">{t('Homepage.button.groups')}</Link>
-            </Button>
-            <Button asChild variant="secondary">
-              <Link href="https://github.com/spliit-app/spliit">
-                <Github className="w-4 h-4 mr-2" />
-                {t('Homepage.button.github')}
-              </Link>
-            </Button>
+            {session ? (
+              <>
+                <Button asChild>
+                  <Link href="/groups">{t('Homepage.button.groups')}</Link>
+                </Button>
+                <Button asChild variant="secondary">
+                  <Link href="/profile">Profile</Link>
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button asChild>
+                  <Link href="/login">Login</Link>
+                </Button>
+                <Button asChild variant="secondary">
+                  <Link href="/register">Sign Up</Link>
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </section>

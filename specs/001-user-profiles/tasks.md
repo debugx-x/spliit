@@ -22,7 +22,7 @@
 
 **Purpose**: Project initialization and database migration setup
 
-- [ ] T001 Verify SQLite/Prisma environment is active and running
+- [x] T001 Verify PostgreSQL/Prisma environment is active and running
 
 ---
 
@@ -32,9 +32,9 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T002 Update `prisma/schema.prisma` with `User` model, and modifications to `Group` and `Participant`.
-- [ ] T003 Generate and run the Prisma migration.
-- [ ] T004 Implement session and authentication utilities in `src/lib/auth.ts`.
+- [x] T002 Update `prisma/schema.prisma` with `User` model, and modifications to `Group` and `Participant`.
+- [x] T003 Generate and run the Prisma migration.
+- [x] T004 Implement session and authentication utilities in `src/lib/auth.ts`.
 
 **Checkpoint**: Foundation ready - database ready and session utility available.
 
@@ -48,8 +48,8 @@
 
 ### Implementation for User Story 1
 
-- [ ] T005 [US1] Create the `/register` UI component in `src/app/(auth)/register/page.tsx`
-- [ ] T006 [US1] Implement registration server action (handle password hashing via bcryptjs, create User).
+- [x] T005 [US1] Create the `/register` UI component in `src/app/(auth)/register/page.tsx`
+- [x] T006 [US1] Implement registration server action (handle password hashing via bcryptjs, create User).
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -63,9 +63,9 @@
 
 ### Implementation for User Story 2
 
-- [ ] T007 [US2] Create the `/login` UI component in `src/app/(auth)/login/page.tsx`
-- [ ] T008 [US2] Implement login server action (verify password, set session cookie).
-- [ ] T009 [US2] Update root layout or middleware to protect standard routes or show logged-in state.
+- [x] T007 [US2] Create the `/login` UI component in `src/app/(auth)/login/page.tsx`
+- [x] T008 [US2] Implement login server action (verify password, set session cookie).
+- [x] T009 [US2] Update root layout or middleware to protect standard routes or show logged-in state.
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -79,8 +79,8 @@
 
 ### Implementation for User Story 3
 
-- [ ] T010 [P] [US3] Create the `/profile` UI component in `src/app/profile/page.tsx`
-- [ ] T011 [US3] Implement profile update server action (updates Display Name, Email, Default Currency).
+- [x] T010 [P] [US3] Create the `/profile` UI component in `src/app/profile/page.tsx`
+- [x] T011 [US3] Implement profile update server action (updates Display Name, Email, Default Currency).
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -94,9 +94,10 @@
 
 ### Implementation for User Story 4
 
-- [ ] T012 [P] [US4] Modify group creation component (e.g. `src/app/groups/new/page.tsx`) to link creator to the authenticated user.
+- [x] T012 [P] [US4] Modify group creation component (e.g. `src/app/groups/new/page.tsx`) to link creator to the authenticated user.
 - [ ] T013 [US4] Implement user search endpoint/action by UniqueID/DisplayName.
-- [ ] T014 [US4] Modify participant addition logic to optionally link the `userId`.
+  _Partial: `searchUsersAction` in `src/app/actions/users.ts` exists (login required, case-insensitive) but is not wired into the group form yet; participants are linked by exact name match in `resolveParticipants`._
+- [x] T014 [US4] Modify participant addition logic to optionally link the `userId`.
 
 ---
 
@@ -105,7 +106,8 @@
 **Purpose**: Improvements that affect multiple user stories
 
 - [ ] T015 Polish UI and ensure Tailwind styles match Spliit aesthetic.
-- [ ] T016 Test end-to-end functionality of user login -> creating a group.
+  _Not started: auth/profile pages are unstyled shadcn cards and not translated._
+- [x] T016 Test end-to-end functionality of user login -> creating a group.
 
 ---
 

@@ -44,3 +44,6 @@ postgres-data
 .specify
 .next-dev.*
 tsc-errors.txt
+
+# local sqlite leftovers
+*.db
