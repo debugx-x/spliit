@@ -75,6 +75,19 @@
     "NotFound": {
       "text": "Цієї групи не існує",
       "link": "Перейти до нещодавно відвіданих груп"
+    },
+    "Join": {
+      "loading": "Loading group…",
+      "title": "Join {name}",
+      "description": "Which one are you? Pick your name to join this group.",
+      "descriptionNoParticipants": "Join this group to see and add its expenses.",
+      "pickName": "Pick your name",
+      "joinAs": "Join as {name}",
+      "notListed": "I'm not listed, add me as {name}",
+      "addMe": "Join as {name}",
+      "notFoundTitle": "Group not found",
+      "notFoundDescription": "This group doesn't exist, or the link is incomplete. Ask a friend in the group to share its link again.",
+      "backToGroups": "Back to my groups"
     }
   },
   "GroupForm": {
@@ -297,9 +310,9 @@
   },
   "Share": {
     "title": "Поділитися",
-    "description": "Щоб інші учасники могли побачити групу і додати витрати, поділіться з ними її URL",
+    "description": "To invite friends, share this link. They log in (or sign up) and pick their name to join the group.",
     "warning": "Попередження!",
-    "warningHelp": "Кожна людина з URL групи зможе переглядати та редагувати витрати. Діліться з обережністю!"
+    "warningHelp": "Anyone who has this link and an account can join the group, then see and edit its expenses. Only share it with your friends."
   },
   "SchemaErrors": {
     "min1": "Введіть принаймні один символ",

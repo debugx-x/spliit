@@ -6,12 +6,22 @@ import { useTranslations } from 'next-intl'
 import { PropsWithChildren, useEffect } from 'react'
 import { CurrentGroupProvider } from './current-group-context'
 import { GroupHeader } from './group-header'
-import { SaveGroupLocally } from './save-recent-group'
 
 export function GroupLayoutClient({
   groupId,
+  participantId,
   children,
-}: PropsWithChildren<{ groupId: string }>) {
+}: PropsWithChildren<{ groupId: string; participantId: string | null }>) {
+  // The participant linked to the user's account is their "active user" in
+  // this group. Set it before children read it on first render (idempotent).
+  if (
+    participantId &&
+    typeof window !== 'undefined' &&
+    localStorage.getItem(`${groupId}-activeUser`) !== participantId
+  ) {
+    localStorage.setItem(`${groupId}-activeUser`, participantId)
+  }
+
   const { data, isLoading } = trpc.groups.get.useQuery({ groupId })
   const t = useTranslations('Groups.NotFound')
   const { toast } = useToast()
@@ -43,7 +53,6 @@ export function GroupLayoutClient({
     <CurrentGroupProvider {...props}>
       <GroupHeader />
       {children}
-      <SaveGroupLocally />
     </CurrentGroupProvider>
   )
 }

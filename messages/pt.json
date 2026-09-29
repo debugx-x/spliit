@@ -78,6 +78,19 @@
     "NotFound": {
       "text": "Este grupo não existe.",
       "link": "Ir para os grupos visitados recentemente"
+    },
+    "Join": {
+      "loading": "Loading group…",
+      "title": "Join {name}",
+      "description": "Which one are you? Pick your name to join this group.",
+      "descriptionNoParticipants": "Join this group to see and add its expenses.",
+      "pickName": "Pick your name",
+      "joinAs": "Join as {name}",
+      "notListed": "I'm not listed, add me as {name}",
+      "addMe": "Join as {name}",
+      "notFoundTitle": "Group not found",
+      "notFoundDescription": "This group doesn't exist, or the link is incomplete. Ask a friend in the group to share its link again.",
+      "backToGroups": "Back to my groups"
     }
   },
   "GroupForm": {

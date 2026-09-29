@@ -1,14 +1,13 @@
-import { updateExpense } from '@/lib/api'
+import { getExpense, updateExpense } from '@/lib/api'
 import { expenseFormSchema } from '@/lib/schemas'
-import { baseProcedure } from '@/trpc/init'
+import { memberProcedure } from '@/trpc/init'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 
-export const updateGroupExpenseProcedure = baseProcedure
+export const updateGroupExpenseProcedure = memberProcedure
   .input(
     z.object({
       expenseId: z.string().min(1),
-      groupId: z.string().min(1),
       expenseFormValues: expenseFormSchema,
       participantId: z.string().optional(),
     }),
@@ -16,10 +15,9 @@ export const updateGroupExpenseProcedure = baseProcedure
   .mutation(
     async ({
       input: { expenseId, groupId, expenseFormValues, participantId },
-      ctx,
     }) => {
-      if (!ctx.session?.userId) {
-        throw new TRPCError({ code: 'UNAUTHORIZED' })
+      if (!(await getExpense(groupId, expenseId))) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Expense not found' })
       }
       const expense = await updateExpense(
         groupId,

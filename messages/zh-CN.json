@@ -78,6 +78,19 @@
     "NotFound": {
       "text": "该群组不存在。",
       "link": "跳转到最近访问过的群组"
+    },
+    "Join": {
+      "loading": "Loading group…",
+      "title": "Join {name}",
+      "description": "Which one are you? Pick your name to join this group.",
+      "descriptionNoParticipants": "Join this group to see and add its expenses.",
+      "pickName": "Pick your name",
+      "joinAs": "Join as {name}",
+      "notListed": "I'm not listed, add me as {name}",
+      "addMe": "Join as {name}",
+      "notFoundTitle": "Group not found",
+      "notFoundDescription": "This group doesn't exist, or the link is incomplete. Ask a friend in the group to share its link again.",
+      "backToGroups": "Back to my groups"
     }
   },
   "GroupForm": {
@@ -336,9 +349,9 @@
   },
   "Share": {
     "title": "分享",
-    "description": "请将此URL分享给其他群组成员，以使其可以查看群组并添加消费。",
+    "description": "To invite friends, share this link. They log in (or sign up) and pick their name to join the group.",
     "warning": "警告！",
-    "warningHelp": "任何持有群组URL的个体都有能够查看并编辑消费。请谨慎分享！"
+    "warningHelp": "Anyone who has this link and an account can join the group, then see and edit its expenses. Only share it with your friends."
   },
   "SchemaErrors": {
     "min1": "输入至少1个字符。",

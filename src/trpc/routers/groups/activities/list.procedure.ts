@@ -1,11 +1,10 @@
 import { getActivities } from '@/lib/api'
-import { baseProcedure } from '@/trpc/init'
+import { memberProcedure } from '@/trpc/init'
 import { z } from 'zod'
 
-export const listGroupActivitiesProcedure = baseProcedure
+export const listGroupActivitiesProcedure = memberProcedure
   .input(
     z.object({
-      groupId: z.string(),
       cursor: z.number().optional().default(0),
       limit: z.number().optional().default(5),
     }),

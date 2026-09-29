@@ -1,11 +1,3 @@
-import {
-  RecentGroup,
-  archiveGroup,
-  deleteRecentGroup,
-  starGroup,
-  unarchiveGroup,
-  unstarGroup,
-} from '@/app/groups/recent-groups-helpers'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -14,7 +6,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useToast } from '@/components/ui/use-toast'
+import { trpc } from '@/trpc/client'
 import { AppRouterOutput } from '@/trpc/routers/_app'
 import { StarFilledIcon } from '@radix-ui/react-icons'
 import { Calendar, MoreHorizontal, Star, Users } from 'lucide-react'
@@ -24,21 +16,19 @@ import { useRouter } from 'next/navigation'
 
 export function RecentGroupListCard({
   group,
-  groupDetail,
-  isStarred,
-  isArchived,
-  refreshGroupsFromStorage,
 }: {
-  group: RecentGroup
-  groupDetail?: AppRouterOutput['groups']['list']['groups'][number]
-  isStarred: boolean
-  isArchived: boolean
-  refreshGroupsFromStorage: () => void
+  group: AppRouterOutput['groups']['list']['groups'][number]
 }) {
   const router = useRouter()
   const locale = useLocale()
-  const toast = useToast()
   const t = useTranslations('Groups')
+  const utils = trpc.useUtils()
+  const { mutate: setPreference } = trpc.groups.setPreference.useMutation({
+    onSettled: () => utils.groups.list.invalidate(),
+  })
+  const isStarred = group.starred
+  const isArchived = group.archived
+  const groupDetail = group
 
   return (
     <li key={group.id}>
@@ -66,13 +56,11 @@ export function RecentGroupListCard({
                   className="-my-3 -ml-3 -mr-1.5"
                   onClick={(event) => {
                     event.stopPropagation()
-                    if (isStarred) {
-                      unstarGroup(group.id)
-                    } else {
-                      starGroup(group.id)
-                      unarchiveGroup(group.id)
-                    }
-                    refreshGroupsFromStorage()
+                    setPreference(
+                      isStarred
+                        ? { groupId: group.id, starred: false }
+                        : { groupId: group.id, starred: true, archived: false },
+                    )
                   }}
                 >
                   {isStarred ? (
@@ -93,30 +81,17 @@ export function RecentGroupListCard({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem
-                      className="text-destructive"
                       onClick={(event) => {
                         event.stopPropagation()
-                        deleteRecentGroup(group)
-                        refreshGroupsFromStorage()
-
-                        toast.toast({
-                          title: t('RecentRemovedToast.title'),
-                          description: t('RecentRemovedToast.description'),
-                        })
-                      }}
-                    >
-                      {t('removeRecent')}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={(event) => {
-                        event.stopPropagation()
-                        if (isArchived) {
-                          unarchiveGroup(group.id)
-                        } else {
-                          archiveGroup(group.id)
-                          unstarGroup(group.id)
-                        }
-                        refreshGroupsFromStorage()
+                        setPreference(
+                          isArchived
+                            ? { groupId: group.id, archived: false }
+                            : {
+                                groupId: group.id,
+                                archived: true,
+                                starred: false,
+                              },
+                        )
                       }}
                     >
                       {t(isArchived ? 'unarchive' : 'archive')}

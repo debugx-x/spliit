@@ -1,11 +1,10 @@
 import { getGroupExpenses } from '@/lib/api'
-import { baseProcedure } from '@/trpc/init'
+import { memberProcedure } from '@/trpc/init'
 import { z } from 'zod'
 
-export const listGroupExpensesProcedure = baseProcedure
+export const listGroupExpensesProcedure = memberProcedure
   .input(
     z.object({
-      groupId: z.string().min(1),
       cursor: z.number().optional(),
       limit: z.number().optional(),
       filter: z.string().optional(),

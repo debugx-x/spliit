@@ -12,27 +12,20 @@ export function randomId() {
   return nanoid()
 }
 
-async function resolveParticipants(
-  participantsData: any[],
+// Links the creator to the participant carrying their display name. Other
+// participants are linked to accounts only when those users join the group
+// themselves (see src/lib/membership.ts): matching by name would give group
+// access to anyone who happens to share a participant's name.
+function resolveParticipants(
+  participantsData: { id: string; name: string }[],
   creatorId?: string,
   creatorDisplayName?: string,
 ) {
-  const names = participantsData.map((p) => p.name)
-  const users = await prisma.user.findMany({
-    where: {
-      OR: [{ uniqueId: { in: names } }, { displayName: { in: names } }],
-    },
-  })
-
+  let creatorLinked = false
   return participantsData.map((p) => {
-    if (creatorId && p.name === creatorDisplayName) {
+    if (creatorId && !creatorLinked && p.name === creatorDisplayName) {
+      creatorLinked = true
       return { ...p, userId: creatorId }
-    }
-    const user = users.find(
-      (u) => u.uniqueId === p.name || u.displayName === p.name,
-    )
-    if (user) {
-      return { ...p, userId: user.id }
     }
     return p
   })
@@ -53,7 +46,7 @@ export async function createGroup(
       creatorId,
       participants: {
         createMany: {
-          data: await resolveParticipants(
+          data: resolveParticipants(
             groupFormValues.participants.map(({ name }) => ({
               id: randomId(),
               name,
@@ -150,10 +143,11 @@ export async function deleteExpense(
   participantId?: string,
 ) {
   const existingExpense = await getExpense(groupId, expenseId)
+  if (!existingExpense) throw new Error(`Invalid expense ID: ${expenseId}`)
   await logActivity(groupId, ActivityType.DELETE_EXPENSE, {
     participantId,
     expenseId,
-    data: existingExpense?.title,
+    data: existingExpense.title,
   })
 
   await prisma.expense.delete({
@@ -349,14 +343,12 @@ export async function updateGroup(
             },
           })),
         createMany: {
-          data: await resolveParticipants(
-            groupFormValues.participants
-              .filter((participant) => participant.id === undefined)
-              .map((participant) => ({
-                id: randomId(),
-                name: participant.name,
-              })),
-          ),
+          data: groupFormValues.participants
+            .filter((participant) => participant.id === undefined)
+            .map((participant) => ({
+              id: randomId(),
+              name: participant.name,
+            })),
         },
       },
     },
@@ -415,8 +407,9 @@ export async function getGroupExpenseCount(groupId: string) {
 }
 
 export async function getExpense(groupId: string, expenseId: string) {
-  return prisma.expense.findUnique({
-    where: { id: expenseId },
+  // Scoped to the group: access checks are done per group
+  return prisma.expense.findFirst({
+    where: { id: expenseId, groupId },
     include: {
       paidBy: true,
       paidFor: true,

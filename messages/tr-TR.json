@@ -75,6 +75,19 @@
     "NotFound": {
       "text": "Bu grup mevcut değil.",
       "link": "Son ziyaret ettiğiniz gruplara dön"
+    },
+    "Join": {
+      "loading": "Loading group…",
+      "title": "Join {name}",
+      "description": "Which one are you? Pick your name to join this group.",
+      "descriptionNoParticipants": "Join this group to see and add its expenses.",
+      "pickName": "Pick your name",
+      "joinAs": "Join as {name}",
+      "notListed": "I'm not listed, add me as {name}",
+      "addMe": "Join as {name}",
+      "notFoundTitle": "Group not found",
+      "notFoundDescription": "This group doesn't exist, or the link is incomplete. Ask a friend in the group to share its link again.",
+      "backToGroups": "Back to my groups"
     }
   },
   "GroupForm": {
@@ -297,9 +310,9 @@
   },
   "Share": {
     "title": "Paylaş",
-    "description": "Diğer katılımcıların grubu görmesi ve masraf ekleyebilmesi için onlarla bu grubun URL'sini paylaşın.",
+    "description": "To invite friends, share this link. They log in (or sign up) and pick their name to join the group.",
     "warning": "Uyarı!",
-    "warningHelp": "Grubun URL'sine sahip olan herkes masrafları görebilir ve düzenleyebilir. Lütfen paylaşırken dikkatli olun!"
+    "warningHelp": "Anyone who has this link and an account can join the group, then see and edit its expenses. Only share it with your friends."
   },
   "SchemaErrors": {
     "min1": "En az bir karakter girin.",
