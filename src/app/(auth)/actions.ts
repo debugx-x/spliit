@@ -58,6 +58,7 @@ export async function registerAction(prevState: any, formData: FormData) {
         displayName,
         uniqueId,
         email,
+        interacEmail: email,
         passwordHash,
       },
     })

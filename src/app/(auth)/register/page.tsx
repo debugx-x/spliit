@@ -69,7 +69,7 @@ function RegisterForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email (For Interac)</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 name="email"
@@ -78,6 +78,10 @@ function RegisterForm() {
                 defaultValue={state?.values?.email}
                 required
               />
+              <p className="text-xs text-muted-foreground">
+                Also used as your Interac e-Transfer email. You can change it in
+                your profile.
+              </p>
             </div>
 
             <div className="space-y-2">

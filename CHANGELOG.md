@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - "My groups" lists the groups you created or joined, from your account, on any device. Starred and archived groups are saved to your account.
 - Nightly encrypted database backups (see README "Backups").
 - Friends view (/friends): what each friend owes you, or you owe them, across all your groups, per currency, with a per-group breakdown. "My groups" shows your overall totals.
+- Settle up with Interac: "Pay with Interac" on your own suggested reimbursements shows the friend's Interac email, the amount and a message to copy into your bank app, then records the payment in one tap. Each user has an editable "Interac e-Transfer email" in their profile (starting as their account email); it's the only email other members see.
 
 ### Changed
 - Creating or editing groups and expenses requires being logged in; logged-out users are redirected to the login page and brought back afterwards.
@@ -20,4 +21,5 @@ All notable changes to this project will be documented in this file.
 - Participants are no longer linked to accounts by matching names; users link themselves by joining.
 
 ### Fixed
+- The profile page sent the user's password hash to the browser.
 - Expenses could be read, updated or deleted through another group's ID.
