@@ -57,14 +57,14 @@ Here is the current state of translation:
 
 1. Clone the repository (or fork it if you intend to contribute)
 2. Start a PostgreSQL server. You can run `./scripts/start-local-db.sh` if you don’t have a server already.
-3. Copy the file `.env.example` as `.env`
+3. Copy the file `.env.example` as `.env`, and set `JWT_SECRET` to a random string of at least 32 characters (e.g. `openssl rand -hex 32`)
 4. Run `npm install` to install dependencies. This will also apply database migrations and update Prisma Client.
 5. Run `npm run dev` to start the development server
 
 ## Run in a container
 
 1. Run `npm run build-image` to build the docker image from the Dockerfile
-2. Copy the file `container.env.example` as `container.env`
+2. Copy the file `container.env.example` as `container.env`, and set `JWT_SECRET` (see above)
 3. Run `npm run start-container` to start the postgres and the spliit2 containers
 4. You can access the app by browsing to http://localhost:3000
 
