@@ -68,6 +68,16 @@ Here is the current state of translation:
 3. Run `npm run start-container` to start the postgres and the spliit2 containers
 4. You can access the app by browsing to http://localhost:3000
 
+## Deploy on Vercel
+
+1. Create a PostgreSQL database (e.g. Vercel → Storage → Prisma Postgres or Neon) and connect it to the project.
+2. Set these environment variables for **both Production and Preview**:
+   - `POSTGRES_URL`: the **direct** connection string (`postgres://…`), not a `prisma+postgres://` Accelerate URL
+   - `JWT_SECRET`: a random string of at least 32 characters (e.g. `openssl rand -hex 32`)
+3. Deploy. Installing dependencies runs `prisma migrate deploy`, so every build (previews included) applies pending migrations to the database it is configured with. Use a separate database for Preview so that unmerged branches can't migrate your production data.
+
+The database must either be empty or have been created by `prisma migrate`. A database created with `prisma db push` has no migration history and `migrate deploy` will fail with `P3005`; reset it (`npx prisma migrate reset`, which deletes all data) or [baseline it](https://www.prisma.io/docs/orm/prisma-migrate/workflows/baselining).
+
 ## Health check
 
 The application has a health check endpoint that can be used to check if the application is running and if the database is accessible.
