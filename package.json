@@ -14,7 +14,8 @@
     "build-image": "./scripts/build-image.sh",
     "start-container": "docker compose --env-file container.env up",
     "test": "jest",
-    "generate-currency-data": "ts-node -T ./src/scripts/generateCurrencyData.ts"
+    "generate-currency-data": "ts-node -T ./src/scripts/generateCurrencyData.ts",
+    "generate-logos": "node scripts/generate-logos.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",

@@ -45,18 +45,6 @@ export const metadata: Metadata = {
     title: 'Split Karega',
   },
   applicationName: 'Split Karega',
-  icons: [
-    {
-      url: '/android-chrome-192x192.png',
-      sizes: '192x192',
-      type: 'image/png',
-    },
-    {
-      url: '/android-chrome-512x512.png',
-      sizes: '512x512',
-      type: 'image/png',
-    },
-  ],
 }
 
 export const viewport: Viewport = {
@@ -77,15 +65,24 @@ function Content({
         <Link
           className="flex items-center gap-2 hover:scale-105 transition-transform"
           href="/"
+          aria-label="Split Karega"
         >
-          <h1>
+          <h1 className="flex items-center gap-2">
             <Image
-              src="/splitsville-logo.png"
-              className="m-1 h-auto w-auto rounded-lg"
+              src="/logo/128x128.png"
+              className="m-1 rounded-lg"
               width={35}
               height={35}
-              alt="Split Karega"
+              alt=""
             />
+            {/* Logged-in menus are wider: show just the icon on narrow phones */}
+            <span
+              className={`${
+                session ? 'hidden sm:inline' : ''
+              } font-bold text-lg tracking-tight whitespace-nowrap`}
+            >
+              Split <span className="text-primary">Karega</span>
+            </span>
           </h1>
         </Link>
         <div role="navigation" aria-label="Menu" className="flex">
