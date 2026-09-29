@@ -20,6 +20,9 @@ All notable changes to this project will be documented in this file.
 - Groups are members-only: their expenses, balances, stats, activity and exports are only available to members. Other users (and unknown group IDs) get "not found".
 - Participants are no longer linked to accounts by matching names; users link themselves by joining.
 
+- The app is English-only: the other 22 languages (and browser-based language detection) were removed, since the new screens only exist in English.
+- Login rate limiting: 5 failed logins per account, or 20 per IP address, within 15 minutes block further attempts until the window passes.
+
 ### Fixed
 - The profile page sent the user's password hash to the browser.
 - Expenses could be read, updated or deleted through another group's ID.

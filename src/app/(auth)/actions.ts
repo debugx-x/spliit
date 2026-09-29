@@ -1,8 +1,15 @@
 'use server'
 
 import { createSession, safeRedirectPath } from '@/lib/auth'
+import {
+  clearAccountLoginFailures,
+  getLoginRetryAfter,
+  loginFailureKeys,
+  recordLoginFailure,
+} from '@/lib/login-rate-limit'
 import { prisma } from '@/lib/prisma'
 import { compare, hash } from 'bcryptjs'
+import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
 
@@ -81,6 +88,17 @@ const loginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 })
 
+// The client's IP address for rate limiting. On Vercel these headers are set
+// by the platform; without them (e.g. locally) only per-account limits apply.
+async function getClientIp() {
+  const requestHeaders = await headers()
+  return (
+    requestHeaders.get('x-real-ip') ??
+    requestHeaders.get('x-forwarded-for')?.split(',')[0].trim() ??
+    null
+  )
+}
+
 export async function loginAction(prevState: any, formData: FormData) {
   const values = formValues(formData, ['uniqueId'])
   const parsed = loginSchema.safeParse(Object.fromEntries(formData))
@@ -98,15 +116,28 @@ export async function loginAction(prevState: any, formData: FormData) {
       },
     })
 
-    if (!user) {
+    const failureKeys = loginFailureKeys({
+      userId: user?.id ?? null,
+      identifier: uniqueId,
+      ip: await getClientIp(),
+    })
+    const retryAfter = await getLoginRetryAfter(failureKeys)
+    if (retryAfter > 0) {
+      const minutes = Math.ceil(retryAfter / 60_000)
+      return {
+        error: `Too many failed login attempts. Try again in ${minutes} minute${
+          minutes === 1 ? '' : 's'
+        }.`,
+        values,
+      }
+    }
+
+    if (!user || !(await compare(password, user.passwordHash))) {
+      await recordLoginFailure(failureKeys)
       return { error: 'Invalid credentials', values }
     }
 
-    const passwordsMatch = await compare(password, user.passwordHash)
-
-    if (!passwordsMatch) {
-      return { error: 'Invalid credentials', values }
-    }
+    await clearAccountLoginFailures(user.id)
 
     await createSession({
       userId: user.id,

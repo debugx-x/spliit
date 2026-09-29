@@ -167,3 +167,13 @@ model UserGroupPreference {
 
   @@id([userId, groupId])
 }
+
+// Failed logins, for rate limiting (per account and per IP). Keys look like
+// "user:<id>", "id:<identifier>" (unknown accounts) or "ip:<address>".
+model LoginFailure {
+  id        String   @id @default(uuid())
+  key       String
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
+}

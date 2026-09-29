@@ -35,7 +35,7 @@ Spliit is a free and open source alternative to Splitwise. You can either use th
 
 ## Contribute
 
-The project is open to contributions. Feel free to open an issue or even a pull-request! 
+The project is open to contributions. Feel free to open an issue or even a pull-request!
 Join the discussion in [the Spliit Discord server](https://discord.gg/YSyVXbwvSY).
 
 If you want to contribute financially and help us keep the application free and without ads, you can also:
@@ -43,15 +43,9 @@ If you want to contribute financially and help us keep the application free and 
 - 💜 [Sponsor me (Sebastien)](https://github.com/sponsors/scastiel), or
 - 💙 [Make a small one-time donation](https://donate.stripe.com/28o3eh96G7hH8k89Ba).
 
-### Translation
+### Language
 
-The project's translations are managed using [our Weblate project](https://hosted.weblate.org/projects/spliit/spliit/). 
-You can easily add missing translations to the project or even add a new language!
-Here is the current state of translation:
-
-<a href="https://hosted.weblate.org/engage/spliit/">
-<img src="https://hosted.weblate.org/widget/spliit/spliit/multi-auto.svg" alt="Translation status" />
-</a>
+Splitsville is English-only (`messages/en-US.json`). Upstream Spliit's translations were removed because the new screens (accounts, groups membership, friends, Interac) exist only in English. To add a language back, add `messages/<locale>.json` and list the locale in `src/i18n/request.ts`.
 
 ## Run locally
 
