@@ -117,7 +117,13 @@
       "add": "Afegir participants",
       "John": "Ermessenda",
       "Jane": "Guillem",
-      "Jack": "Jaume"
+      "Jack": "Jaume",
+      "addFriend": "Add a friend",
+      "addFriendDescription": "Search your friend's Unique ID or name. They'll be added with their account and see the group in their groups right away.",
+      "searchPlaceholder": "Unique ID or name",
+      "searching": "Searching…",
+      "noResults": "No one found. Friends need an account first, or you can share the group link.",
+      "linked": "Linked to an account"
     },
     "Settings": {
       "title": "Configuració local",

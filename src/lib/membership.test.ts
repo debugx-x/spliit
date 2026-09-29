@@ -5,9 +5,70 @@ import { Prisma } from '@prisma/client'
 import {
   MembershipError,
   addSelfAsParticipant,
+  assignParticipantLinks,
   claimParticipant,
   getMembership,
 } from './membership'
+
+describe('assignParticipantLinks', () => {
+  const validUserIds = new Set(['amy', 'bob', 'creator'])
+
+  it('links requested accounts that exist', () => {
+    expect(
+      assignParticipantLinks(
+        [
+          { name: 'Amy', userId: 'amy' },
+          { name: 'Jack', userId: undefined },
+        ],
+        { validUserIds },
+      ),
+    ).toEqual([{ name: 'Amy', userId: 'amy' }, { name: 'Jack' }])
+  })
+
+  it('ignores unknown, duplicate and already linked accounts', () => {
+    expect(
+      assignParticipantLinks(
+        [
+          { name: 'Ghost', userId: 'nobody' },
+          { name: 'Amy', userId: 'amy' },
+          { name: 'Amy again', userId: 'amy' },
+          { name: 'Bob', userId: 'bob' },
+        ],
+        { validUserIds, alreadyLinkedUserIds: ['bob'] },
+      ),
+    ).toEqual([
+      { name: 'Ghost' },
+      { name: 'Amy', userId: 'amy' },
+      { name: 'Amy again' },
+      { name: 'Bob' },
+    ])
+  })
+
+  it("links the creator's own participant by display name, once", () => {
+    expect(
+      assignParticipantLinks(
+        [{ name: 'Carla' }, { name: 'Carla' }, { name: 'Jack' }],
+        { validUserIds, creatorId: 'creator', creatorDisplayName: 'Carla' },
+      ),
+    ).toEqual([
+      { name: 'Carla', userId: 'creator' },
+      { name: 'Carla' },
+      { name: 'Jack' },
+    ])
+  })
+
+  it('does not link the creator twice when they were added explicitly', () => {
+    expect(
+      assignParticipantLinks(
+        [
+          { name: 'Me', userId: 'creator' },
+          { name: 'Carla', userId: null },
+        ],
+        { validUserIds, creatorId: 'creator', creatorDisplayName: 'Carla' },
+      ),
+    ).toEqual([{ name: 'Me', userId: 'creator' }, { name: 'Carla' }])
+  })
+})
 
 const mockDb = {
   group: { findUnique: jest.fn() },

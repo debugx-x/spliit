@@ -14,6 +14,10 @@ export const groupFormSchema = z
         z.object({
           id: z.string().optional(),
           name: z.string().min(2, 'min2').max(50, 'max50'),
+          // Account to link a *new* participant to (a friend added by Unique
+          // ID). Ignored for existing participants: links can't be changed
+          // through the group form.
+          userId: z.string().nullish(),
         }),
       )
       .min(1),

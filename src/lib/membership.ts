@@ -22,6 +22,42 @@ export class MembershipError extends Error {
   }
 }
 
+// Decides which *new* participants of a group get linked to an account:
+// - a requested account (a friend added by Unique ID) if that user exists,
+//   isn't already linked in the group and isn't requested twice;
+// - otherwise, when creating a group, the creator's own participant (the
+//   one carrying their display name).
+// Anyone else becomes a plain name and can link themselves by joining.
+export function assignParticipantLinks<
+  P extends { name: string; userId?: string | null },
+>(
+  participants: P[],
+  options: {
+    validUserIds: Set<string>
+    alreadyLinkedUserIds?: Iterable<string>
+    creatorId?: string
+    creatorDisplayName?: string
+  },
+): (Omit<P, 'userId'> & { userId?: string })[] {
+  const linked = new Set(options.alreadyLinkedUserIds)
+  const result = participants.map(({ userId, ...participant }) => {
+    if (userId && options.validUserIds.has(userId) && !linked.has(userId)) {
+      linked.add(userId)
+      return { ...participant, userId }
+    }
+    return participant
+  })
+
+  const { creatorId, creatorDisplayName } = options
+  if (creatorId && !linked.has(creatorId)) {
+    const own = result.find(
+      (p) => !('userId' in p) && p.name === creatorDisplayName,
+    )
+    if (own) Object.assign(own, { userId: creatorId })
+  }
+  return result
+}
+
 // Returns null when the group doesn't exist.
 export async function getMembership(
   groupId: string,
