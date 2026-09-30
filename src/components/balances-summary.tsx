@@ -32,15 +32,13 @@ export function BalancesSummary({
           ) : (
             totals.map((total) => (
               <span key={`${total.currencyCode}${total.currency}`}>
-                <span
-                  className={amountColor(total.owedToYou, 'text-green-600')}
-                >
+                <span className={amountColor(total.owedToYou, 'text-owed')}>
                   {t('owedToYouTotal', {
                     amount: format(total, total.owedToYou),
                   })}
                 </span>
                 {' · '}
-                <span className={amountColor(total.youOwe, 'text-red-600')}>
+                <span className={amountColor(total.youOwe, 'text-owe')}>
                   {t('youOweTotal', { amount: format(total, total.youOwe) })}
                 </span>
               </span>

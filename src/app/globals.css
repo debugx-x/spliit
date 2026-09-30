@@ -3,50 +3,65 @@
 @tailwind utilities;
 
 @layer base {
+  /* Marigold & mint: the logo's mint, a marigold accent, warm neutrals.
+     Every text/background pair used is WCAG AA (4.5:1) in both themes. */
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 163 94% 24%;
-    --primary-foreground: 0 100% 100%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 142.1 76.2% 36.3%;
-    --radius: 0.5rem;
+    --background: 37.9 100% 96.3%; /* #FFF8EC */
+    --foreground: 36.9 26.5% 9.6%; /* #1F1A12 */
+    --card: 0 0% 100%; /* #FFFFFF */
+    --card-foreground: 36.9 26.5% 9.6%; /* #1F1A12 */
+    --popover: 0 0% 100%; /* #FFFFFF */
+    --popover-foreground: 36.9 26.5% 9.6%; /* #1F1A12 */
+    --primary: 164.3 87.4% 24.9%; /* #08775A */
+    --primary-foreground: 0 0% 100%; /* #FFFFFF */
+    --secondary: 39.3 61.7% 90.8%; /* #F6ECD9 */
+    --secondary-foreground: 36.9 26.5% 9.6%; /* #1F1A12 */
+    --muted: 39.3 61.7% 90.8%; /* #F6ECD9 */
+    --muted-foreground: 36.5 12% 37.5%; /* #6B6254 */
+    --accent: 38.7 79.5% 92.4%; /* #FBF0DC */
+    --accent-foreground: 36.9 26.5% 9.6%; /* #1F1A12 */
+    --destructive: 4.4 63.7% 46.5%; /* #C2362B */
+    --destructive-foreground: 0 0% 100%; /* #FFFFFF */
+    --border: 40 54.5% 87.1%; /* #F0E4CC */
+    --input: 39.1 47.9% 81.2%; /* #E6D6B8 */
+    --ring: 164.3 87.4% 24.9%; /* #08775A */
+    --marigold: 41.9 100% 47.5%; /* #F2A900 */
+    --marigold-foreground: 40.5 100% 8.4%; /* #2B1D00 */
+    --owe: 4.4 63.7% 46.5%; /* #C2362B */
+    --owed: 161.1 83.5% 26.1%; /* #0B7A57 */
+    --hero: 164.3 87.4% 24.9%; /* #08775A */
+    --hero-foreground: 0 0% 100%; /* #FFFFFF */
+    --hero-muted: 153.3 56.3% 93.7%; /* #E6F8F0 */
+    --radius: 1rem;
   }
 
   .dark {
-    --background: 20 14.3% 4.1%;
-    --foreground: 0 0% 95%;
-    --card: 24 9.8% 10%;
-    --card-foreground: 0 0% 95%;
-    --popover: 0 0% 9%;
-    --popover-foreground: 0 0% 95%;
-    --primary: 161 90% 45%;
-    --primary-foreground: 144.9 80.4% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 15%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 12 6.5% 15.1%;
-    --accent-foreground: 0 0% 98%;
-    /* --destructive: 0 62.8% 30.6%; */
-    --destructive: 0 87% 47%;
-    --destructive-foreground: 0 85.7% 97.3%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 142.4 71.8% 29.2%;
+    --background: 36 27.8% 7.1%; /* #17130D */
+    --foreground: 39 55.6% 92.9%; /* #F7F0E3 */
+    --card: 34.3 25.9% 10.6%; /* #221C14 */
+    --card-foreground: 39 55.6% 92.9%; /* #F7F0E3 */
+    --popover: 34.3 25.9% 10.6%; /* #221C14 */
+    --popover-foreground: 39 55.6% 92.9%; /* #F7F0E3 */
+    --primary: 161.3 65.1% 50.6%; /* #2FD3A0 */
+    --primary-foreground: 161.7 75% 9.4%; /* #062A1F */
+    --secondary: 34.7 26% 14.3%; /* #2E261B */
+    --secondary-foreground: 39 55.6% 92.9%; /* #F7F0E3 */
+    --muted: 34.7 26% 14.3%; /* #2E261B */
+    --muted-foreground: 38.8 18.3% 63.5%; /* #B3A791 */
+    --accent: 34.7 27.5% 13.5%; /* #2C2419 */
+    --accent-foreground: 39 55.6% 92.9%; /* #F7F0E3 */
+    --destructive: 5.4 100% 71.6%; /* #FF7B6E */
+    --destructive-foreground: 5 75% 9.4%; /* #2A0906 */
+    --border: 32.7 23.4% 18.4%; /* #3A3024 */
+    --input: 33.3 22.3% 23.7%; /* #4A3E2F */
+    --ring: 161.3 65.1% 50.6%; /* #2FD3A0 */
+    --marigold: 41.6 90.9% 57.1%; /* #F5B82E */
+    --marigold-foreground: 40.5 100% 8.4%; /* #2B1D00 */
+    --owe: 5.4 100% 71.6%; /* #FF7B6E */
+    --owed: 159.3 70% 59.4%; /* #4FE0AE */
+    --hero: 161.2 61.5% 15.3%; /* #0F3F30 */
+    --hero-foreground: 39 55.6% 92.9%; /* #F7F0E3 */
+    --hero-muted: 157.6 62.6% 79%; /* #A8EBD2 */
   }
 }
 
@@ -55,14 +70,12 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    /* Plus Jakarta Sans has narrow spaces (0.17em): open them up a little */
+    word-spacing: 0.06em;
   }
 }
 
-.landing-header {
-  @apply bg-gradient-to-br from-emerald-800 to-emerald-600 dark:from-emerald-300 dark:to-emerald-600 bg-clip-text;
-}
-
 .landing-header strong {
-  @apply font-bold text-transparent;
+  @apply font-extrabold text-primary underline decoration-marigold decoration-4 underline-offset-8;
 }
