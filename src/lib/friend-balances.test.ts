@@ -21,8 +21,16 @@ function group(
   currency: { currency: string; currencyCode: string | null },
   participants: GroupBalanceInput['participants'],
   reimbursements: GroupBalanceInput['reimbursements'],
+  kind: GroupBalanceInput['kind'] = 'GROUP',
 ): GroupBalanceInput {
-  return { id, name: `Group ${id}`, ...currency, participants, reimbursements }
+  return {
+    id,
+    name: `Group ${id}`,
+    kind,
+    ...currency,
+    participants,
+    reimbursements,
+  }
 }
 
 describe('summarizeFriendBalances', () => {
@@ -120,7 +128,7 @@ describe('summarizeFriendBalances', () => {
     expect(totals).toEqual([])
   })
 
-  it("ignores groups where you have no participant and others' debts", () => {
+  it("ignores groups where you have no participant and others' debts; co-members are listed as settled", () => {
     const bob = { id: 'b', name: 'Bob', userId: 'bob', user: null }
     const { friends } = summarizeFriendBalances(
       [
@@ -139,7 +147,71 @@ describe('summarizeFriendBalances', () => {
       ],
       'me',
     )
-    expect(friends).toEqual([])
+    expect(friends.map((f) => [f.displayName, f.amounts, f.groups])).toEqual([
+      ['Alex', [], []],
+      ['Bob', [], []],
+    ])
+  })
+
+  it('lists friends you share a group with but have no balance with, once', () => {
+    const { friends, totals } = summarizeFriendBalances(
+      [
+        group('g1', cad, [me, alex('a1')], []),
+        group('g2', usd, [me, alex('a2')], []),
+      ],
+      'me',
+    )
+    expect(friends).toEqual([
+      {
+        key: 'user:alex',
+        userId: 'alex',
+        displayName: 'Alex',
+        uniqueId: 'alex1',
+        groupName: null,
+        amounts: [],
+        groups: [],
+      },
+    ])
+    expect(totals).toEqual([])
+  })
+
+  it('labels friend-set lines with the other members', () => {
+    const sam = {
+      id: 's',
+      name: 'Sam',
+      userId: 'sam',
+      user: { displayName: 'Sam', uniqueId: 'sam1' },
+    }
+    const { friends } = summarizeFriendBalances(
+      [
+        group(
+          'pair',
+          cad,
+          [me, alex('a1')],
+          [{ from: 'a1', to: 'me-p', amount: 4000 }],
+          'FRIEND_SET',
+        ),
+        group(
+          'trio',
+          cad,
+          [me, alex('a2'), sam],
+          [
+            { from: 'a2', to: 'me-p', amount: 3000 },
+            { from: 's', to: 'me-p', amount: 3000 },
+          ],
+          'FRIEND_SET',
+        ),
+      ],
+      'me',
+    )
+    const alexLines = friends.find((f) => f.userId === 'alex')!.groups
+    expect(alexLines.map((l) => [l.kind, l.otherMembers, l.amount])).toEqual([
+      ['FRIEND_SET', ['Alex'], 4000],
+      ['FRIEND_SET', ['Alex', 'Sam'], 3000],
+    ])
+    expect(friends.find((f) => f.userId === 'alex')!.amounts).toEqual([
+      { ...cad, amount: 7000 },
+    ])
   })
 
   it('sorts by largest outstanding amount, then name', () => {

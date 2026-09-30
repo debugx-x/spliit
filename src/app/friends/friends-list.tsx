@@ -1,13 +1,18 @@
 'use client'
 
 import { BalancesSummary } from '@/components/balances-summary'
+import {
+  AddExpenseWithFriendsButton,
+  useAddExpenseWithFriends,
+} from '@/components/friend-picker'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Amount } from '@/lib/friend-balances'
+import { friendSetTitle } from '@/lib/friend-set-names'
 import { formatCurrency, getCurrencyFromGroup } from '@/lib/utils'
 import { trpc } from '@/trpc/client'
 import { AppRouterOutput } from '@/trpc/routers/_app'
-import { ChevronRight, Loader2 } from 'lucide-react'
+import { ChevronRight, Loader2, Plus } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import Link from 'next/link'
 
@@ -40,7 +45,10 @@ export function FriendsList() {
 
   return (
     <>
-      <h1 className="font-bold text-2xl">{t('title')}</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <h1 className="font-bold text-2xl">{t('title')}</h1>
+        <AddExpenseWithFriendsButton friends={pickableFriends(data.friends)} />
+      </div>
       <BalancesSummary totals={data.totals} />
       {data.friends.length === 0 ? (
         <p className="text-sm">
@@ -64,6 +72,56 @@ export function FriendsList() {
   )
 }
 
+// Friends with an account, for the friend picker
+export function pickableFriends(friends: Friend[]) {
+  return friends.flatMap((friend) =>
+    friend.userId
+      ? [
+          {
+            userId: friend.userId,
+            displayName: friend.displayName,
+            uniqueId: friend.uniqueId,
+          },
+        ]
+      : [],
+  )
+}
+
+// "Cabin", or for expenses outside groups "Non-group expenses" (with one
+// friend) / "Non-group · You, Alex & Sam"
+export function useLineLabel() {
+  const t = useTranslations('Friends')
+  return (line: Friend['groups'][number]) =>
+    line.kind !== 'FRIEND_SET'
+      ? line.groupName
+      : line.otherMembers.length <= 1
+      ? t('nonGroup')
+      : t('nonGroupWith', { names: friendSetTitle(line.otherMembers) })
+}
+
+function AddExpenseButton({ userId }: { userId: string }) {
+  const t = useTranslations('Friends')
+  const { open, isPending, error } = useAddExpenseWithFriends()
+  return (
+    <div className="flex items-center gap-2">
+      <Button
+        size="sm"
+        variant="secondary"
+        disabled={isPending}
+        onClick={() => open([userId]).catch(() => {})}
+      >
+        {isPending ? (
+          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+        ) : (
+          <Plus className="w-4 h-4 mr-2" />
+        )}
+        {t('addExpense')}
+      </Button>
+      {error && <span className="text-sm text-destructive">{error}</span>}
+    </div>
+  )
+}
+
 function FriendCards({ friends }: { friends: Friend[] }) {
   return (
     <ul className="flex flex-col gap-2">
@@ -79,6 +137,7 @@ function FriendCards({ friends }: { friends: Friend[] }) {
 function FriendCard({ friend }: { friend: Friend }) {
   const t = useTranslations('Friends')
   const format = useFormatAmount()
+  const lineLabel = useLineLabel()
   const name = friend.displayName
 
   return (
@@ -126,7 +185,8 @@ function FriendCard({ friend }: { friend: Friend }) {
             </div>
           </CardHeader>
         </summary>
-        <CardContent className="px-4 pb-4 pt-0">
+        <CardContent className="px-4 pb-4 pt-0 flex flex-col gap-2">
+          {friend.userId && <AddExpenseButton userId={friend.userId} />}
           <ul className="text-sm divide-y">
             {friend.groups.map((line, index) => (
               <li
@@ -135,7 +195,7 @@ function FriendCard({ friend }: { friend: Friend }) {
               >
                 <Button variant="link" asChild className="p-0 h-auto">
                   <Link href={`/groups/${line.groupId}/balances`}>
-                    {line.groupName}
+                    {lineLabel(line)}
                   </Link>
                 </Button>
                 <span className="flex items-center gap-3">

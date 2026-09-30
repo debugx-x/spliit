@@ -1,6 +1,5 @@
 'use client'
 
-import { searchUsersAction } from '@/app/actions/users'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -10,10 +9,8 @@ import {
 } from '@/components/ui/popover'
 import { Loader2, UserPlus } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useEffect, useState } from 'react'
-import { useDebounce } from 'use-debounce'
-
-type FoundUser = Awaited<ReturnType<typeof searchUsersAction>>[number]
+import { useState } from 'react'
+import { FoundUser, useUserSearch } from './use-user-search'
 
 // Adds a registered friend to the group's participants, linked to their
 // account, so the group shows up in their "My groups" without the link.
@@ -27,25 +24,7 @@ export function AddFriendButton({
   const t = useTranslations('GroupForm.Participants')
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
-  const [debouncedQuery] = useDebounce(query.trim(), 300)
-  const [results, setResults] = useState<FoundUser[] | null>(null)
-  const [loading, setLoading] = useState(false)
-
-  useEffect(() => {
-    if (debouncedQuery.length < 2) {
-      setResults(null)
-      return
-    }
-    let cancelled = false
-    setLoading(true)
-    searchUsersAction(debouncedQuery)
-      .then((users) => !cancelled && setResults(users))
-      .catch(() => !cancelled && setResults([]))
-      .finally(() => !cancelled && setLoading(false))
-    return () => {
-      cancelled = true
-    }
-  }, [debouncedQuery])
+  const { results, loading } = useUserSearch(query)
 
   const visible = results?.filter((u) => !excludedUserIds.includes(u.id))
 
@@ -54,10 +33,7 @@ export function AddFriendButton({
       open={open}
       onOpenChange={(value) => {
         setOpen(value)
-        if (!value) {
-          setQuery('')
-          setResults(null)
-        }
+        if (!value) setQuery('')
       }}
     >
       <PopoverTrigger asChild>
@@ -98,7 +74,6 @@ export function AddFriendButton({
                     onAdd(user)
                     setOpen(false)
                     setQuery('')
-                    setResults(null)
                   }}
                 >
                   <span className="truncate">{user.displayName}</span>

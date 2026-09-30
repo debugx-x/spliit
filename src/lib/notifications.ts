@@ -1,9 +1,11 @@
 import { Currency } from '@/lib/currency'
+import { listNames } from '@/lib/friend-set-names'
 import { prisma } from '@/lib/prisma'
 import { calculateShare } from '@/lib/totals'
 import { formatCurrency, getCurrencyFromGroup } from '@/lib/utils'
 import {
   Group,
+  GroupKind,
   NotificationType,
   Participant,
   Prisma,
@@ -250,7 +252,35 @@ type DescribableNotification = {
   actorName: string
   data: unknown
   groupId: string
-  group: Pick<Group, 'name' | 'currency' | 'currencyCode'>
+  // The recipient: friend sets are described relative to them
+  userId?: string
+  group: Pick<Group, 'name' | 'currency' | 'currencyCode'> & {
+    kind?: GroupKind
+    participants?: { name: string; userId: string | null }[]
+  }
+}
+
+// Friend sets: the members other than the recipient ("Alex", "Alex & Sam")
+export function otherSetMembers(notification: DescribableNotification) {
+  return (notification.group.participants ?? [])
+    .filter((p) => !notification.userId || p.userId !== notification.userId)
+    .map((p) => p.name)
+}
+
+// Where it happened: " in Cabin" for groups. For friend sets, nothing for a
+// pair (it's just the two of you) or " with Sam" for the other people in a
+// larger set, besides the one who made the change.
+function place(notification: DescribableNotification, withOthers: boolean) {
+  if (notification.group.kind !== GroupKind.FRIEND_SET)
+    return ` in ${notification.group.name}`
+  if (!withOthers) return ''
+  const others = otherSetMembers(notification).filter(
+    (name) => name !== notification.actorName,
+  )
+  const members = otherSetMembers(notification)
+  return members.length > 1 && others.length > 0
+    ? ` with ${listNames(others)}`
+    : ''
 }
 
 // The notification as a sentence, e.g. "Sam paid you $50.00 in Cabin".
@@ -260,31 +290,33 @@ export function describeNotification(notification: DescribableNotification) {
   const currency: Currency = getCurrencyFromGroup(notification.group)
   const money = (amount = 0) => formatCurrency(currency, amount, 'en-US')
   const actor = notification.actorName
-  const group = notification.group.name
+  const where = place(notification, true)
   const title = `“${data.title ?? 'an expense'}”`
   const yourShare =
     data.share && data.share > 0 ? ` · your share ${money(data.share)}` : ''
 
   switch (notification.type) {
     case NotificationType.PAYMENT_RECEIVED:
-      return `${data.payerName} paid you ${money(data.amount)} in ${group}${
-        data.recordedByOther ? ` (recorded by ${actor})` : ''
-      }`
+      // A payment is between two people: no "with …" in friend sets
+      return `${data.payerName} paid you ${money(data.amount)}${place(
+        notification,
+        false,
+      )}${data.recordedByOther ? ` (recorded by ${actor})` : ''}`
     case NotificationType.ADDED_TO_GROUP:
-      return `${actor} added you to ${group}`
+      return `${actor} added you to ${notification.group.name}`
     case NotificationType.EXPENSE_ADDED:
       return `${actor} added ${title} (${money(
         data.amount,
-      )}) in ${group}${yourShare}${data.paidByYou ? ' · paid by you' : ''}`
+      )})${where}${yourShare}${data.paidByYou ? ' · paid by you' : ''}`
     case NotificationType.EXPENSE_CHANGED:
-      if (data.removed) return `${actor} removed you from ${title} in ${group}`
+      if (data.removed) return `${actor} removed you from ${title}${where}`
       if (data.oldAmount !== undefined)
-        return `${actor} changed ${title} in ${group}: ${money(
+        return `${actor} changed ${title}${where}: ${money(
           data.oldAmount,
         )} → ${money(data.amount)}${yourShare}`
-      return `${actor} changed how ${title} is split in ${group}${yourShare}`
+      return `${actor} changed how ${title} is split${where}${yourShare}`
     case NotificationType.EXPENSE_DELETED:
-      return `${actor} deleted ${title} (${money(data.amount)}) in ${group}`
+      return `${actor} deleted ${title} (${money(data.amount)})${where}`
   }
 }
 

@@ -10,8 +10,18 @@ datasource db {
   url      = env("POSTGRES_URL")
 }
 
+// FRIEND_SET: a hidden group for expenses with friends outside groups, one per
+// exact set of people (see src/lib/friend-sets.ts)
+enum GroupKind {
+  GROUP
+  FRIEND_SET
+}
+
 model Group {
   id            String                @id
+  kind          GroupKind             @default(GROUP)
+  // FRIEND_SET only: the members' user IDs, sorted and joined
+  memberKey     String?               @unique
   name          String
   information   String?               @db.Text
   currency      String                @default("$")

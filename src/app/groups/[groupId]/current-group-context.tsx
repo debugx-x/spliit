@@ -3,9 +3,11 @@ import { PropsWithChildren, createContext, useContext } from 'react'
 
 type Group = NonNullable<AppRouterOutput['groups']['get']['group']>
 
-type GroupContext =
+// participantId: the viewer's own participant in the group
+type GroupContext = { participantId: string | null } & (
   | { isLoading: false; groupId: string; group: Group }
   | { isLoading: true; groupId: string; group: undefined }
+)
 
 const CurrentGroupContext = createContext<GroupContext | null>(null)
 

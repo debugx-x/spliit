@@ -10,7 +10,15 @@ export async function listNotifications(userId: string) {
     orderBy: { createdAt: 'desc' },
     take: FEED_LENGTH,
     include: {
-      group: { select: { name: true, currency: true, currencyCode: true } },
+      group: {
+        select: {
+          name: true,
+          currency: true,
+          currencyCode: true,
+          kind: true,
+          participants: { select: { name: true, userId: true } },
+        },
+      },
     },
   })
   return notifications.map((notification) => ({

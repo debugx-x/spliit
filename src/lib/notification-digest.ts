@@ -1,8 +1,13 @@
 import { sendEmail } from '@/lib/email'
 import { emailButton, emailLayout, escapeHtml } from '@/lib/email-layout'
-import { describeNotification, notificationPath } from '@/lib/notifications'
+import { listNames } from '@/lib/friend-set-names'
+import {
+  describeNotification,
+  notificationPath,
+  otherSetMembers,
+} from '@/lib/notifications'
 import { prisma } from '@/lib/prisma'
-import { Group, NotificationType, User } from '@prisma/client'
+import { GroupKind, NotificationType, User } from '@prisma/client'
 
 // The daily email summary: once a day (Vercel Cron), each user gets one email
 // with their notifications not yet emailed, for the types they chose in
@@ -30,12 +35,13 @@ export function wantsEmail(preferences: Preferences, type: NotificationType) {
   return preferences[PREFERENCE_BY_TYPE[type]]
 }
 
-type DigestItem = {
-  type: NotificationType
-  actorName: string
-  data: unknown
-  groupId: string
-  group: Pick<Group, 'name' | 'currency' | 'currencyCode'>
+type DigestItem = Parameters<typeof describeNotification>[0]
+
+// A section heading: the group's name, or "With Alex & Sam" for friend sets
+function sectionTitle(item: DigestItem) {
+  return item.group.kind === GroupKind.FRIEND_SET
+    ? `With ${listNames(otherSetMembers(item))}`
+    : item.group.name
 }
 
 // One email for all of a user's items (oldest first), grouped by group.
@@ -62,7 +68,7 @@ export function buildDigestEmail(
     `Here's what happened in your groups:`,
     ...sections.map((section) =>
       [
-        `${section[0].group.name} (${baseUrl}/groups/${section[0].groupId})`,
+        `${sectionTitle(section[0])} (${baseUrl}/groups/${section[0].groupId})`,
         ...section.map((item) => `- ${describeNotification(item)}`),
       ].join('\n'),
     ),
@@ -79,7 +85,7 @@ ${sections
     ) => `<p style="margin:20px 0 4px;font-weight:600"><a href="${escapeHtml(
       `${baseUrl}/groups/${section[0].groupId}`,
     )}" style="color:#047857;text-decoration:none">${escapeHtml(
-      section[0].group.name,
+      sectionTitle(section[0]),
     )}</a></p>
 <ul style="margin:0;padding-left:20px">
 ${section
@@ -114,7 +120,15 @@ export async function sendNotificationDigests(
     where: { emailedAt: null, createdAt: { lte: now } },
     orderBy: { createdAt: 'asc' },
     include: {
-      group: { select: { name: true, currency: true, currencyCode: true } },
+      group: {
+        select: {
+          name: true,
+          currency: true,
+          currencyCode: true,
+          kind: true,
+          participants: { select: { name: true, userId: true } },
+        },
+      },
       user: {
         select: {
           email: true,

@@ -500,7 +500,10 @@
     "inGroup": "in {group}",
     "empty": "No balances with anyone yet. Add expenses in a group to see who owes whom.",
     "goToGroups": "Go to your groups",
-    "pay": "Pay"
+    "pay": "Pay",
+    "addExpense": "Add expense",
+    "nonGroup": "Non-group expenses",
+    "nonGroupWith": "Non-group · {names}"
   },
   "Notifications": {
     "title": "Notifications",
@@ -509,5 +512,42 @@
     "today": "Today",
     "yesterday": "Yesterday",
     "emailSettings": "Choose which ones you also get in a daily email in your <link>profile</link>."
+  },
+  "FriendPicker": {
+    "button": "Add expense with friends",
+    "title": "Add an expense with friends",
+    "description": "Outside any group: pick one or more friends. Search by name or Unique ID to add someone new.",
+    "searchPlaceholder": "Search by name or Unique ID",
+    "searching": "Searching…",
+    "noResults": "No one found.",
+    "noFriends": "No friends yet: search for someone above.",
+    "pickFriends": "Pick at least one friend",
+    "continue": "{count, plural, one {Continue with # friend} other {Continue with # friends}}"
+  },
+  "Dashboard": {
+    "title": "Dashboard",
+    "loading": "Loading your balances…",
+    "addExpense": "Add an expense",
+    "addExpenseDescription": "With friends outside any group, or in one of your groups.",
+    "withFriends": "With friends",
+    "inAGroup": "In a group",
+    "settleUp": "Settle up",
+    "settleUpDescription": "What you owe, by group. Pay with Interac or mark it as paid on the balances page.",
+    "allSettled": "You're all settled up.",
+    "totalBalance": "Total balance",
+    "youOwe": "You owe",
+    "youAreOwed": "You are owed",
+    "youOweNobody": "You don't owe anyone.",
+    "nobodyOwesYou": "Nobody owes you.",
+    "yourGroups": "Your groups",
+    "seeAll": "See all",
+    "people": "{count, plural, one {# person} other {# people}}",
+    "noGroups": "No groups yet.",
+    "createGroup": "Create a group",
+    "recentActivity": "Recent activity",
+    "noActivity": "Nothing yet.",
+    "welcomeTitle": "Welcome to Split Karega!",
+    "welcomeText": "Create a group for a trip, household or event, or add an expense with friends outside any group.",
+    "youOweFriend": "You owe <strong>{name}</strong> {amount}"
   }
 }

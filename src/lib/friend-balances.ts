@@ -5,6 +5,7 @@ import {
   getSuggestedReimbursements,
 } from '@/lib/balances'
 import { prisma } from '@/lib/prisma'
+import { GroupKind } from '@prisma/client'
 
 // What each friend owes you (or you owe them) across all your groups.
 //
@@ -12,13 +13,16 @@ import { prisma } from '@/lib/prisma'
 // its Balances page shows) that involve your participant. Amounts are merged
 // across groups per friend and per currency; different currencies are never
 // added together. Participants not linked to an account are listed per group:
-// a name isn't an identity.
+// a name isn't an identity. Friends with an account who share a group with
+// you but have no balance are listed too ("Settled up"), so you can add
+// expenses with them.
 
 export type GroupCurrency = { currency: string; currencyCode: string | null }
 
 export type GroupBalanceInput = GroupCurrency & {
   id: string
   name: string
+  kind: GroupKind
   participants: {
     id: string
     name: string
@@ -39,7 +43,14 @@ export type FriendBalance = {
   // Set for participants without an account: the only group they're in
   groupName: string | null
   amounts: Amount[] // net per currency, zeros removed
-  groups: (Amount & { groupId: string; groupName: string })[]
+  groups: (Amount & {
+    groupId: string
+    groupName: string
+    kind: GroupKind
+    // Friend sets: the other members' names, to label the line
+    // "Non-group expenses" (a pair) or "Non-group · You, Alex & Sam"
+    otherMembers: string[]
+  })[]
 }
 
 export type CurrencyTotal = GroupCurrency & {
@@ -92,6 +103,13 @@ export function summarizeFriendBalances(
       friend.groups.push({
         groupId: group.id,
         groupName: group.name,
+        kind: group.kind,
+        otherMembers:
+          group.kind === GroupKind.FRIEND_SET
+            ? group.participants
+                .filter((p) => p.id !== me.id)
+                .map((p) => p.user?.displayName ?? p.name)
+            : [],
         ...currency,
         amount: signed,
       })
@@ -100,6 +118,25 @@ export function summarizeFriendBalances(
       )
       if (net) net.amount += signed
       else friend.amounts.push({ ...currency, amount: signed })
+    }
+  }
+
+  // Friends with an account you share a group with, without a balance
+  for (const group of groups) {
+    if (!group.participants.some((p) => p.userId === userId)) continue
+    for (const other of group.participants) {
+      if (!other.userId || other.userId === userId) continue
+      const key = `user:${other.userId}`
+      if (friends.has(key)) continue
+      friends.set(key, {
+        key,
+        userId: other.userId,
+        displayName: other.user?.displayName ?? other.name,
+        uniqueId: other.user?.uniqueId ?? null,
+        groupName: null,
+        amounts: [],
+        groups: [],
+      })
     }
   }
 
@@ -132,6 +169,7 @@ export async function getFriendBalances(userId: string) {
     select: {
       id: true,
       name: true,
+      kind: true,
       currency: true,
       currencyCode: true,
       participants: {

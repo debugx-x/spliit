@@ -95,6 +95,33 @@ describe('buildDigestEmail', () => {
   })
 })
 
+describe('buildDigestEmail for friend sets', () => {
+  it('heads set sections "With <the others>"', () => {
+    const item = {
+      type: 'EXPENSE_ADDED' as const,
+      actorName: 'Alex',
+      data: { title: 'Taxi', amount: 9000, share: 3000 },
+      groupId: 'g9',
+      userId: 'uP',
+      group: {
+        name: 'Priya, Alex & Sam',
+        currency: '$',
+        currencyCode: 'CAD',
+        kind: 'FRIEND_SET' as const,
+        participants: [
+          { name: 'Priya', userId: 'uP' },
+          { name: 'Alex', userId: 'uA' },
+          { name: 'Sam', userId: 'uS' },
+        ],
+      },
+    }
+    const email = buildDigestEmail('Priya', [item, item], 'https://sk.app')
+    expect(email.text).toContain('With Alex & Sam (https://sk.app/groups/g9)')
+    expect(email.html).toContain('With Alex &amp; Sam</a>')
+    expect(email.text).not.toContain('Priya, Alex & Sam')
+  })
+})
+
 describe('sendNotificationDigests', () => {
   const now = new Date('2026-10-01T13:00:00Z')
   const row = (id: string, userId: string, item: object, user: object) => ({

@@ -15,6 +15,7 @@ import { ExpenseFormValues, GroupFormValues } from '@/lib/schemas'
 import {
   ActivityType,
   Expense,
+  GroupKind,
   RecurrenceRule,
   RecurringExpenseLink,
 } from '@prisma/client'
@@ -398,6 +399,18 @@ export async function updateGroup(
 ) {
   const existingGroup = await getGroup(groupId)
   if (!existingGroup) throw new Error('Invalid group ID')
+
+  // Friend sets keep their members and name: only the currency can change
+  if (existingGroup.kind === GroupKind.FRIEND_SET) {
+    await logActivity(groupId, ActivityType.UPDATE_GROUP, { participantId })
+    return prisma.group.update({
+      where: { id: groupId },
+      data: {
+        currency: groupFormValues.currency,
+        currencyCode: groupFormValues.currencyCode,
+      },
+    })
+  }
 
   // Only new participants can be linked to an account here (friends added by
   // Unique ID); existing participants' links are never changed by this form.

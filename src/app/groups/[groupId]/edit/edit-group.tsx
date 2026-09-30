@@ -20,6 +20,7 @@ export const EditGroup = () => {
         await utils.groups.invalidate()
       }}
       protectedParticipantIds={data?.participantsWithExpenses}
+      currencyOnly={data?.group?.kind === 'FRIEND_SET'}
     />
   )
 }

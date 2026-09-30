@@ -7,7 +7,9 @@ import {
   addSelfAsParticipant,
   assignParticipantLinks,
   claimParticipant,
+  getJoinPreview,
   getMembership,
+  listUserGroups,
 } from './membership'
 
 describe('assignParticipantLinks', () => {
@@ -71,7 +73,7 @@ describe('assignParticipantLinks', () => {
 })
 
 const mockDb = {
-  group: { findUnique: jest.fn() },
+  group: { findUnique: jest.fn(), findMany: jest.fn() },
   participant: {
     updateMany: jest.fn(),
     findFirst: jest.fn(),
@@ -138,7 +140,12 @@ describe('claimParticipant', () => {
       participantId: 'p1',
     })
     expect(db.participant.updateMany).toHaveBeenCalledWith({
-      where: { id: 'p1', groupId: 'g', userId: null },
+      where: {
+        id: 'p1',
+        groupId: 'g',
+        userId: null,
+        group: { kind: 'GROUP' },
+      },
       data: { userId: 'u' },
     })
   })
@@ -203,5 +210,31 @@ describe('addSelfAsParticipant', () => {
     await expect(
       addSelfAsParticipant('g', { id: 'u', displayName: 'Amy' }),
     ).rejects.toMatchObject({ code: 'NOT_FOUND' })
+  })
+})
+
+describe('friend sets', () => {
+  it('are not listed in My groups', async () => {
+    db.group.findMany.mockResolvedValue([])
+    await listUserGroups('u')
+    expect(db.group.findMany.mock.calls[0][0].where.kind).toBe('GROUP')
+  })
+
+  it("can't be previewed or joined", async () => {
+    db.group.findUnique.mockResolvedValue({
+      name: 'Priya & Alex',
+      kind: 'FRIEND_SET',
+      creatorId: 'p',
+      participants: [],
+    })
+    await expect(getJoinPreview('g', 'u')).resolves.toBeNull()
+    db.group.findUnique.mockResolvedValue({
+      kind: 'FRIEND_SET',
+      participants: [],
+    })
+    await expect(
+      addSelfAsParticipant('g', { id: 'u', displayName: 'Dev' }),
+    ).rejects.toMatchObject({ code: 'NOT_FOUND' })
+    expect(db.participant.create).not.toHaveBeenCalled()
   })
 })

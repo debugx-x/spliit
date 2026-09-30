@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { GroupKind } from '@prisma/client'
 import { nanoid } from 'nanoid'
 
 // A user is a member of a group if they created it or if one of its
@@ -83,6 +84,7 @@ export async function getJoinPreview(groupId: string, userId: string) {
     where: { id: groupId },
     select: {
       name: true,
+      kind: true,
       creatorId: true,
       participants: {
         select: { id: true, name: true, userId: true },
@@ -90,7 +92,8 @@ export async function getJoinPreview(groupId: string, userId: string) {
       },
     },
   })
-  if (!group) return null
+  // Friend sets can't be joined: same answer as an unknown group
+  if (!group || group.kind === GroupKind.FRIEND_SET) return null
   const linked = group.participants.find((p) => p.userId === userId)
   return {
     name: group.name,
@@ -119,12 +122,17 @@ export async function claimParticipant(
 ) {
   try {
     const { count } = await prisma.participant.updateMany({
-      where: { id: participantId, groupId, userId: null },
+      where: {
+        id: participantId,
+        groupId,
+        userId: null,
+        group: { kind: GroupKind.GROUP },
+      },
       data: { userId },
     })
     if (count === 0) {
       const exists = await prisma.participant.findFirst({
-        where: { id: participantId, groupId },
+        where: { id: participantId, groupId, group: { kind: GroupKind.GROUP } },
         select: { id: true },
       })
       if (!exists)
@@ -153,10 +161,12 @@ export async function addSelfAsParticipant(
   const group = await prisma.group.findUnique({
     where: { id: groupId },
     select: {
+      kind: true,
       participants: { select: { id: true, name: true, userId: true } },
     },
   })
-  if (!group) throw new MembershipError('NOT_FOUND', 'Group not found.')
+  if (!group || group.kind === GroupKind.FRIEND_SET)
+    throw new MembershipError('NOT_FOUND', 'Group not found.')
 
   const existing = group.participants.find((p) => p.userId === user.id)
   if (existing) return { participantId: existing.id }
@@ -184,6 +194,8 @@ export async function addSelfAsParticipant(
 export async function listUserGroups(userId: string) {
   const groups = await prisma.group.findMany({
     where: {
+      // Friend sets (expenses with friends outside groups) aren't listed
+      kind: GroupKind.GROUP,
       OR: [{ creatorId: userId }, { participants: { some: { userId } } }],
     },
     include: {
