@@ -6,11 +6,13 @@ import {
   createResetToken,
   hashResetToken,
   requestPasswordReset,
+  resetEmail,
   resetPasswordWithToken,
 } from './password-reset'
 
 const mockDb = {
   user: { findFirst: jest.fn(), update: jest.fn() },
+  loginFailure: { deleteMany: jest.fn() },
   passwordResetToken: {
     findFirst: jest.fn(),
     findUniqueOrThrow: jest.fn(),
@@ -115,11 +117,31 @@ describe('resetPasswordWithToken', () => {
     expect(mockDb.passwordResetToken.deleteMany).toHaveBeenCalledWith({
       where: { userId: 'u1', tokenHash: { not: hashResetToken('tok') } },
     })
+    // The failed-login lockout is lifted, so the new password works at once
+    expect(mockDb.loginFailure.deleteMany).toHaveBeenCalledWith({
+      where: { key: 'user:u1' },
+    })
   })
 
   it('refuses invalid, expired or already used tokens', async () => {
     mockDb.passwordResetToken.updateMany.mockResolvedValue({ count: 0 })
     await expect(resetPasswordWithToken('tok', 'new-hash')).resolves.toBeNull()
     expect(mockDb.user.update).not.toHaveBeenCalled()
+    expect(mockDb.loginFailure.deleteMany).not.toHaveBeenCalled()
+  })
+})
+
+describe('resetEmail', () => {
+  it('is branded and escapes the name and link in the HTML version', () => {
+    const email = resetEmail('<Amy & co>', 'https://x/reset-password?token=a"b')
+    expect(email.subject).toBe('Reset your Split Karega password')
+    expect(email.text).toContain('Hi <Amy & co>,')
+    expect(email.text).toContain('https://x/reset-password?token=a"b')
+    expect(email.html).toContain('Hi &lt;Amy &amp; co&gt;,')
+    expect(email.html).toContain(
+      'href="https://x/reset-password?token=a&quot;b"',
+    )
+    expect(email.html).not.toContain('<Amy')
+    expect(email.html).not.toContain('Splitsville')
   })
 })

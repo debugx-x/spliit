@@ -1,8 +1,10 @@
 'use server'
 
 import { createSession, safeRedirectPath } from '@/lib/auth'
+import { getClientIp } from '@/lib/client-ip'
 import {
   clearAccountLoginFailures,
+  formatRetryAfter,
   getLoginRetryAfter,
   loginFailureKeys,
   recordLoginFailure,
@@ -10,7 +12,6 @@ import {
 import { prisma } from '@/lib/prisma'
 import { passwordSchema } from '@/lib/schemas'
 import { compare, hash } from 'bcryptjs'
-import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
 
@@ -89,18 +90,6 @@ const loginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 })
 
-// The client's IP address for rate limiting. On Vercel these headers are set
-// by the platform (locally, Next.js sets x-forwarded-for to the loopback
-// address). Without them, only per-account limits apply.
-async function getClientIp() {
-  const requestHeaders = await headers()
-  return (
-    requestHeaders.get('x-real-ip') ??
-    requestHeaders.get('x-forwarded-for')?.split(',')[0].trim() ??
-    null
-  )
-}
-
 export async function loginAction(prevState: any, formData: FormData) {
   const values = formValues(formData, ['uniqueId'])
   const parsed = loginSchema.safeParse(Object.fromEntries(formData))
@@ -125,11 +114,10 @@ export async function loginAction(prevState: any, formData: FormData) {
     })
     const retryAfter = await getLoginRetryAfter(failureKeys)
     if (retryAfter > 0) {
-      const minutes = Math.ceil(retryAfter / 60_000)
       return {
-        error: `Too many failed login attempts. Try again in ${minutes} minute${
-          minutes === 1 ? '' : 's'
-        }.`,
+        error: `Too many failed login attempts. ${formatRetryAfter(
+          retryAfter,
+        )}`,
         values,
       }
     }

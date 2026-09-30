@@ -4,9 +4,12 @@
 import {
   ACCOUNT_FAILURE_LIMIT,
   LOGIN_WINDOW_MS,
+  RESET_REQUEST_IP_LIMIT,
+  formatRetryAfter,
   getLoginRetryAfter,
   loginFailureKeys,
   recordLoginFailure,
+  resetRequestKeys,
 } from './login-rate-limit'
 
 const mockDb = {
@@ -100,5 +103,45 @@ describe('recordLoginFailure', () => {
     expect(mockDb.loginFailure.deleteMany).toHaveBeenCalledWith({
       where: { createdAt: { lt: expect.any(Date) } },
     })
+  })
+})
+
+describe('password reset requests', () => {
+  it('are counted per IP address, separately from login failures', () => {
+    expect(RESET_REQUEST_IP_LIMIT).toBe(5)
+    expect(resetRequestKeys('1.2.3.4')).toEqual([
+      { key: 'reset-ip:1.2.3.4', limit: 5 },
+    ])
+    expect(resetRequestKeys(null)).toEqual([])
+  })
+
+  it('block the 6th request from an IP within the window', async () => {
+    const now = Date.parse('2026-09-29T12:00:00Z')
+    const keys = resetRequestKeys('1.2.3.4')
+    mockDb.loginFailure.findMany.mockResolvedValue(
+      [1, 2, 3, 4].map((m) => ({ createdAt: new Date(now - m * 60_000) })),
+    )
+    await expect(getLoginRetryAfter(keys, now)).resolves.toBe(0)
+    mockDb.loginFailure.findMany.mockResolvedValue(
+      [1, 2, 3, 4, 5].map((m) => ({ createdAt: new Date(now - m * 60_000) })),
+    )
+    await expect(getLoginRetryAfter(keys, now)).resolves.toBe(
+      LOGIN_WINDOW_MS - 5 * 60_000,
+    )
+    expect(mockDb.loginFailure.findMany.mock.calls[1][0].where.key).toBe(
+      'reset-ip:1.2.3.4',
+    )
+  })
+
+  it('record nothing without an IP address', async () => {
+    await recordLoginFailure(resetRequestKeys(null))
+    expect(mockDb.loginFailure.createMany).not.toHaveBeenCalled()
+  })
+})
+
+describe('formatRetryAfter', () => {
+  it('rounds up to whole minutes', () => {
+    expect(formatRetryAfter(1)).toBe('Try again in 1 minute.')
+    expect(formatRetryAfter(10 * 60_000 + 1)).toBe('Try again in 11 minutes.')
   })
 })

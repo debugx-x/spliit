@@ -1,8 +1,15 @@
 'use server'
 
 import { createSession } from '@/lib/auth'
+import { getClientIp } from '@/lib/client-ip'
 import { isEmailConfigured } from '@/lib/email'
 import { env } from '@/lib/env'
+import {
+  formatRetryAfter,
+  getLoginRetryAfter,
+  recordLoginFailure,
+  resetRequestKeys,
+} from '@/lib/login-rate-limit'
 import {
   requestPasswordReset,
   resetPasswordWithToken,
@@ -23,6 +30,15 @@ export async function forgotPasswordAction(prevState: any, formData: FormData) {
       identifier,
     }
   }
+  const limitKeys = resetRequestKeys(await getClientIp())
+  const retryAfter = await getLoginRetryAfter(limitKeys)
+  if (retryAfter > 0) {
+    return {
+      error: `Too many reset requests. ${formatRetryAfter(retryAfter)}`,
+      identifier,
+    }
+  }
+  await recordLoginFailure(limitKeys)
   try {
     await requestPasswordReset(identifier, env.NEXT_PUBLIC_BASE_URL)
   } catch (error) {

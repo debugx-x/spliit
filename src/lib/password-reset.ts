@@ -1,4 +1,5 @@
 import { sendEmail } from '@/lib/email'
+import { clearAccountLoginFailures } from '@/lib/login-rate-limit'
 import { prisma } from '@/lib/prisma'
 import { createHash, randomBytes } from 'crypto'
 
@@ -52,16 +53,26 @@ export async function requestPasswordReset(
   })
 
   const link = `${baseUrl}/reset-password?token=${encodeURIComponent(token)}`
-  await sendEmail({
-    to: user.email,
-    subject: 'Reset your Splitsville password',
-    text: `Hi ${user.displayName},\n\nSomeone (hopefully you) asked to reset your Splitsville password. Open this link to choose a new one:\n\n${link}\n\nThe link works once and expires in 1 hour. If you didn't ask for this, you can ignore this email.`,
-    html: `<p>Hi ${escapeHtml(
-      user.displayName,
-    )},</p><p>Someone (hopefully you) asked to reset your Splitsville password.</p><p><a href="${escapeHtml(
-      link,
-    )}">Choose a new password</a></p><p>The link works once and expires in 1 hour. If you didn't ask for this, you can ignore this email.</p>`,
-  })
+  await sendEmail({ to: user.email, ...resetEmail(user.displayName, link) })
+}
+
+// The reset email, in plain text and a simple HTML version (inline styles,
+// since email clients ignore stylesheets).
+export function resetEmail(displayName: string, link: string) {
+  const name = escapeHtml(displayName)
+  const href = escapeHtml(link)
+  return {
+    subject: 'Reset your Split Karega password',
+    text: `Hi ${displayName},\n\nSomeone (hopefully you) asked to reset your Split Karega password. Open this link to choose a new one:\n\n${link}\n\nThe link works once and expires in 1 hour. If you didn't ask for this, you can ignore this email.`,
+    html: `<div style="font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:480px;margin:0 auto;padding:24px;color:#111827;line-height:1.5">
+<p style="font-size:20px;font-weight:700;margin:0 0 24px">Split <span style="color:#047857">Karega</span></p>
+<p>Hi ${name},</p>
+<p>Someone (hopefully you) asked to reset your Split Karega password.</p>
+<p style="margin:24px 0"><a href="${href}" style="display:inline-block;background:#047857;color:#ffffff;text-decoration:none;font-weight:600;padding:12px 20px;border-radius:8px">Choose a new password</a></p>
+<p style="font-size:14px;color:#6b7280">The link works once and expires in 1 hour. If you didn't ask for this, you can ignore this email.</p>
+<p style="font-size:12px;color:#6b7280;word-break:break-all">If the button doesn't work, open this link: <a href="${href}" style="color:#047857">${href}</a></p>
+</div>`,
+  }
 }
 
 function escapeHtml(value: string) {
@@ -82,14 +93,14 @@ export async function isResetTokenValid(token: string) {
 }
 
 // Sets a new password using a reset link. The token is consumed atomically,
-// so it works only once. Returns the user, or null if the link is invalid,
-// expired or already used.
+// so it works only once, and the account's failed-login lockout is cleared.
+// Returns the user, or null if the link is invalid, expired or already used.
 export async function resetPasswordWithToken(
   token: string,
   newPasswordHash: string,
 ) {
   const tokenHash = hashResetToken(token)
-  return prisma.$transaction(async (tx) => {
+  const user = await prisma.$transaction(async (tx) => {
     const now = new Date()
     const { count } = await tx.passwordResetToken.updateMany({
       where: { tokenHash, usedAt: null, expiresAt: { gt: now } },
@@ -112,4 +123,7 @@ export async function resetPasswordWithToken(
     })
     return user
   })
+  // Someone locked out by failed logins can log in again with the new password
+  if (user) await clearAccountLoginFailures(user.id)
+  return user
 }

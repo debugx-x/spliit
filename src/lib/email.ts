@@ -9,11 +9,11 @@ export function isEmailConfigured() {
   return !!env.SMTP_URL || process.env.NODE_ENV !== 'production'
 }
 
-// "Splitsville <address>", from EMAIL_FROM or the SMTP login.
+// "Split Karega <address>", from EMAIL_FROM or the SMTP login.
 function fromAddress(smtpUrl: string) {
   if (env.EMAIL_FROM) return env.EMAIL_FROM
   const user = decodeURIComponent(new URL(smtpUrl).username)
-  return `Splitsville <${user}>`
+  return `Split Karega <${user}>`
 }
 
 export async function sendEmail(email: Email) {
