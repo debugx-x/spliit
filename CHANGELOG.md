@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Previews use their own database, separate from production. The throwaway accounts and groups created while testing were removed from production before launch (with an encrypted backup taken first), and the one-off cleanup workflow was removed.
 - After logging in, signing up or resetting a password (without a page to return to), you land on the dashboard instead of "My groups".
 - Renamed the app to **Split Karega** (page titles, installed app name, share and export texts, homepage).
 - New Split Karega logo pack: a coin split in two, on green. SVG masters in `public/brand/`; `npm run generate-logos` renders the favicon, app icons (including maskable and Apple touch icon), header logo, iOS splash and social banner from them.

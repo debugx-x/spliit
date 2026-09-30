@@ -77,7 +77,7 @@ npm test                   # Jest
 1. Import the repository in Vercel and connect a PostgreSQL database (e.g. Storage → Prisma Postgres, or Neon).
 2. Set the environment variables below, then deploy.
 
-Every build runs `prisma migrate deploy` (via `npm install`), so each deployment applies pending migrations to its database. Previews can share the production database, as split-karega.vercel.app does (keep migrations additive), or use a separate one so unmerged branches never touch production data.
+Every build runs `prisma migrate deploy` (via `npm install`), so each deployment applies pending migrations to its database. Give previews their own database, so unmerged branches never touch production data: create a second database in Vercel → Storage and connect it to the project for **Preview** only, with the production database connected for Production (and Development). Each connection sets `POSTGRES_URL` for its environments.
 
 The database must be empty or created by `prisma migrate`. A database made with `prisma db push` fails with `P3005`: reset it or [baseline it](https://www.prisma.io/docs/orm/prisma-migrate/workflows/baselining).
 
