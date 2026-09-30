@@ -16,6 +16,10 @@ export default async function ProfilePage() {
       email: true,
       defaultCurrency: true,
       interacEmail: true,
+      notifyPayments: true,
+      notifyAddedToGroup: true,
+      notifyNewExpenses: true,
+      notifyExpenseChanges: true,
     },
   })
 

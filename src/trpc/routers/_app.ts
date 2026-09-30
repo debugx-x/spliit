@@ -1,6 +1,7 @@
 import { categoriesRouter } from '@/trpc/routers/categories'
 import { friendsRouter } from '@/trpc/routers/friends'
 import { groupsRouter } from '@/trpc/routers/groups'
+import { notificationsRouter } from '@/trpc/routers/notifications'
 import { inferRouterOutputs } from '@trpc/server'
 import { createTRPCRouter } from '../init'
 
@@ -8,6 +9,7 @@ export const appRouter = createTRPCRouter({
   groups: groupsRouter,
   categories: categoriesRouter,
   friends: friendsRouter,
+  notifications: notificationsRouter,
 })
 
 export type AppRouter = typeof appRouter

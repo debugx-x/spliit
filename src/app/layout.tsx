@@ -1,4 +1,5 @@
 import { ApplePwaSplash } from '@/app/apple-pwa-splash'
+import { NotificationBell } from '@/components/notification-bell'
 import { ProgressBar } from '@/components/progress-bar'
 import { ThemeProvider } from '@/components/theme-provider'
 import { ThemeToggle } from '@/components/theme-toggle'
@@ -107,6 +108,11 @@ function Content({
                 >
                   <Link href="/friends">{t('Header.friends')}</Link>
                 </Button>
+              </li>
+            )}
+            {session && (
+              <li>
+                <NotificationBell />
               </li>
             )}
             {session ? (

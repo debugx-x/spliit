@@ -15,6 +15,7 @@ export const updateGroupExpenseProcedure = memberProcedure
   .mutation(
     async ({
       input: { expenseId, groupId, expenseFormValues, participantId },
+      ctx,
     }) => {
       if (!(await getExpense(groupId, expenseId))) {
         throw new TRPCError({ code: 'NOT_FOUND', message: 'Expense not found' })
@@ -24,6 +25,7 @@ export const updateGroupExpenseProcedure = memberProcedure
         expenseId,
         expenseFormValues,
         participantId,
+        ctx.session,
       )
       return { expenseId: expense.id }
     },

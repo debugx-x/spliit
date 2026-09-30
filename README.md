@@ -85,6 +85,20 @@ The database must either be empty or have been created by `prisma migrate`. A da
 
 Without `SMTP_URL`, the forgot password page says that reset by email isn't set up. In local development, the email is printed to the server console instead. Reset requests are limited to 5 per IP address per 15 minutes, and one email per account per minute.
 
+## Notifications
+
+Payments, new expenses, changes to expenses and being added to a group create notifications for the people involved who have an account (never for the person who made the change):
+
+- **In the app:** the bell in the header shows the number of unread notifications; `/notifications` lists them.
+- **By email:** a daily summary (at most one email a day, only when something happened). Each user picks the kinds of updates they get by email in their profile; all are on by default.
+
+The summary is sent by a [Vercel Cron job](https://vercel.com/docs/cron-jobs) (`vercel.json`) calling `/api/cron/notifications` every day at 13:00 UTC (around 9 am Eastern), using the same email setup as password reset. To protect that endpoint:
+
+1. Set `CRON_SECRET` in Vercel (Production, as a secret) to a random string of at least 32 characters, e.g. from `openssl rand -hex 32`. Vercel sends it with each cron request.
+2. Redeploy. The job appears under Settings → Cron Jobs, where **Run** sends the summary right away.
+
+Locally, without `CRON_SECRET`, open http://localhost:3000/api/cron/notifications to send the summaries.
+
 ## Backups
 
 The [Database backup](.github/workflows/db-backup.yml) workflow runs every night: it dumps the database with `pg_dump`, encrypts the dump with a passphrase and keeps it as a workflow artifact for 30 days. Encryption matters because artifacts of a public repository can be downloaded by any GitHub user.
