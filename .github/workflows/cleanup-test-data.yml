@@ -1,0 +1,82 @@
+name: Clean up test data
+
+# One-off: removes the throwaway test accounts (emails at example.com and
+# plus-addresses of the owner's Gmail) and the groups only they were in,
+# using scripts/cleanup-test-data.sql. Run "preview" first: it shows what
+# would be deleted and changes nothing. "delete" takes an encrypted backup
+# first, like the nightly one. Remove this workflow once it has been used.
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'preview (changes nothing) or delete'
+        type: choice
+        options: [preview, delete]
+        default: preview
+      confirm:
+        description: 'For delete, type: delete test data'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check inputs and secrets
+        env:
+          MODE: ${{ inputs.mode }}
+          CONFIRM: ${{ inputs.confirm }}
+          BACKUP_DATABASE_URL: ${{ secrets.BACKUP_DATABASE_URL }}
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          [ -n "$BACKUP_DATABASE_URL" ] || { echo "::error::Repository secret BACKUP_DATABASE_URL is not set"; exit 1; }
+          if [ "$MODE" = delete ]; then
+            [ "$CONFIRM" = "delete test data" ] || { echo "::error::To delete, type exactly: delete test data"; exit 1; }
+            [ -n "$BACKUP_PASSPHRASE" ] || { echo "::error::Repository secret BACKUP_PASSPHRASE is not set"; exit 1; }
+          fi
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Back up first (delete only)
+        if: inputs.mode == 'delete'
+        env:
+          BACKUP_DATABASE_URL: ${{ secrets.BACKUP_DATABASE_URL }}
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          docker run --rm -e BACKUP_DATABASE_URL postgres:latest \
+            sh -c 'pg_dump --no-owner --no-privileges --format=custom "$BACKUP_DATABASE_URL"' \
+            > backup.dump
+          test -s backup.dump
+          gpg --batch --yes --pinentry-mode loopback --passphrase-fd 3 \
+            --symmetric --cipher-algo AES256 \
+            --output backup.dump.gpg backup.dump 3<<< "$BACKUP_PASSPHRASE"
+          rm backup.dump
+
+      - name: Upload the backup
+        if: inputs.mode == 'delete'
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-backup-before-cleanup
+          path: backup.dump.gpg
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Run the cleanup (${{ inputs.mode }})
+        env:
+          MODE: ${{ inputs.mode }}
+          BACKUP_DATABASE_URL: ${{ secrets.BACKUP_DATABASE_URL }}
+        run: |
+          # Preview ends the transaction with ROLLBACK, delete with COMMIT
+          end=ROLLBACK
+          [ "$MODE" = delete ] && end=COMMIT
+          { cat scripts/cleanup-test-data.sql; echo "$end;"; } |
+            docker run --rm -i -e BACKUP_DATABASE_URL postgres:latest \
+              sh -c 'psql -v ON_ERROR_STOP=1 "$BACKUP_DATABASE_URL"'
+          echo "Mode: $MODE ($end)"

@@ -66,5 +66,5 @@ export async function resetPasswordAction(prevState: any, formData: FormData) {
     uniqueId: user.uniqueId,
     displayName: user.displayName,
   })
-  redirect('/groups')
+  redirect('/')
 }
