@@ -36,8 +36,12 @@ export default function ForgotPasswordPage() {
             <CardContent>
               <p className="text-sm">
                 If an account matches, we&apos;ve emailed it a reset link. The
-                link expires in 1 hour. Check your spam folder if you don&apos;t
-                see it.
+                link expires in 1 hour.
+              </p>
+              <p className="mt-3 text-sm text-muted-foreground">
+                Don&apos;t see it after a minute? Check your Spam folder, and
+                mark the email &quot;Not spam&quot; so the next ones reach your
+                inbox.
               </p>
             </CardContent>
             <CardFooter>
