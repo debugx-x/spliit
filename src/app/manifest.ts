@@ -6,11 +6,13 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: 'Split Karega',
     description:
       'A free, minimalist web app to split expenses with your friends. No ads, no limits.',
-    start_url: '/groups',
+    start_url: '/',
+    // The app's identity for browsers: keep it, so existing installs update
+    // instead of being treated as a different app
     id: '/groups',
     display: 'standalone',
-    background_color: '#fff',
-    theme_color: '#047857',
+    background_color: '#FFF8EC',
+    theme_color: '#08775A',
     icons: [
       {
         src: '/logo/48x48.png',

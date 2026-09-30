@@ -50,6 +50,19 @@ module.exports = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        // Marigold & mint theme extras
+        marigold: {
+          DEFAULT: 'hsl(var(--marigold))',
+          foreground: 'hsl(var(--marigold-foreground))',
+        },
+        hero: {
+          DEFAULT: 'hsl(var(--hero))',
+          foreground: 'hsl(var(--hero-foreground))',
+          muted: 'hsl(var(--hero-muted))',
+        },
+        // Money: what you owe / what you're owed
+        owe: 'hsl(var(--owe))',
+        owed: 'hsl(var(--owed))',
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -71,6 +84,7 @@ module.exports = {
         'accordion-up': 'accordion-up 0.2s ease-out',
       },
       fontFamily: {
+        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
         rounded: [
           'ui-rounded',
           'Hiragino Maru Gothic ProN',

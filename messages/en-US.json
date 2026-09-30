@@ -1,17 +1,38 @@
 {
   "Homepage": {
-    "title": "Share <strong>Expenses</strong> with <strong>Friends & Family</strong>",
-    "description": "<strong>Split karega?</strong> Keep track of who paid and who owes whom in your friend group. Free, with no limits.",
+    "title": "<strong>Split karega?</strong>",
+    "description": "Keep track of who paid and who owes whom in your friend group. Free, with no limits.",
+    "signUp": "Sign up, it's free",
+    "logIn": "Log in",
     "button": {
       "groups": "Go to groups",
       "github": "GitHub"
+    },
+    "features": {
+      "groups": {
+        "title": "Groups & friends",
+        "text": "Trips, flatmates or one dinner with a friend: split it any way you like."
+      },
+      "interac": {
+        "title": "Settle with Interac",
+        "text": "Copy your friend's Interac email and the amount into your bank app, then mark it paid."
+      },
+      "free": {
+        "title": "Free, no limits",
+        "text": "No ads, no paywall, no cap on expenses. Made for our friend group."
+      }
     }
   },
   "Header": {
     "groups": "Groups",
     "friends": "Friends",
     "notifications": "Notifications",
-    "unreadNotifications": "{count, plural, one {# unread notification} other {# unread notifications}}"
+    "unreadNotifications": "{count, plural, one {# unread notification} other {# unread notifications}}",
+    "dashboard": "Dashboard",
+    "menu": "Menu",
+    "profile": "Your profile ({name})",
+    "login": "Log in",
+    "signUp": "Sign up"
   },
   "Footer": {
     "madeIn": "Made in Montréal, Québec 🇨🇦",
@@ -318,7 +339,7 @@
     "Reimbursements": {
       "title": "Suggested reimbursements",
       "description": "Here are suggestions for optimized reimbursements between participants.",
-      "noImbursements": "It looks like your group doesn’t need any reimbursement 😁",
+      "noImbursements": "Hisaab barabar! Nobody in this group owes anyone.",
       "owes": "<strong>{from}</strong> owes <strong>{to}</strong>",
       "markAsPaid": "Mark as paid"
     },
@@ -496,7 +517,7 @@
     "owesYou": "owes you {amount}",
     "youOwe": "you owe {amount}",
     "settledUp": "Settled up",
-    "settledTitle": "Settled up",
+    "settledTitle": "Settled up · hisaab barabar",
     "inGroup": "in {group}",
     "empty": "No balances with anyone yet. Add expenses in a group to see who owes whom.",
     "goToGroups": "Go to your groups",
@@ -533,7 +554,7 @@
     "inAGroup": "In a group",
     "settleUp": "Settle up",
     "settleUpDescription": "What you owe, by group. Pay with Interac or mark it as paid on the balances page.",
-    "allSettled": "You're all settled up.",
+    "allSettled": "Hisaab barabar! You're all settled up.",
     "totalBalance": "Total balance",
     "youOwe": "You owe",
     "youAreOwed": "You are owed",
@@ -548,6 +569,22 @@
     "noActivity": "Nothing yet.",
     "welcomeTitle": "Welcome to Split Karega!",
     "welcomeText": "Create a group for a trip, household or event, or add an expense with friends outside any group.",
-    "youOweFriend": "You owe <strong>{name}</strong> {amount}"
+    "youOweFriend": "You owe <strong>{name}</strong> {amount}",
+    "greeting": "Namaste, {name}",
+    "overall": "Overall",
+    "overallYouOwe": "Overall, you owe",
+    "overallYouAreOwed": "Overall, you're owed",
+    "settled": "Hisaab barabar!",
+    "youOweShort": "you owe",
+    "youAreOwedShort": "you're owed",
+    "addExpenseShort": "Add expense"
+  },
+  "BottomNav": {
+    "label": "Main",
+    "home": "Home",
+    "groups": "Groups",
+    "friends": "Friends",
+    "activity": "Activity",
+    "addExpense": "Add expense"
   }
 }

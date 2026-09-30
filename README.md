@@ -18,7 +18,7 @@ It is a fork of [Spliit](https://github.com/spliit-app/spliit) by Sebastien Cast
 - Groups for trips, households or events. The group's link is the invite: people open it, log in and join as one of the participants, or add themselves.
 - Add friends to a group directly by name or Unique ID. The group then shows up in their "My groups".
 - Expenses with one or more friends **outside groups** ("Add expense" on the dashboard or the Friends page).
-- **Dashboard** (the homepage when logged in): total balance, "You owe" and "You are owed" per friend, your groups, recent activity, and quick "Add an expense" and "Settle up" buttons.
+- **Dashboard** (the homepage when logged in): your overall balance, "You owe" and "You are owed" per friend, your groups, recent activity, and quick "Add expense" and "Settle up" buttons.
 - **Friends** page: what each friend owes you, or you owe them, across all your groups, per currency.
 
 **Expenses**
@@ -41,7 +41,8 @@ It is a fork of [Spliit](https://github.com/spliit-app/spliit) by Sebastien Cast
 
 - Sign up with a display name, a Unique ID and an email. Groups are members-only.
 - "Forgot password?" by email, and login rate limiting.
-- Installable as an app (PWA), with light and dark themes. English only.
+- Installable as an app (PWA). On phones, a tab bar at the bottom has Home, Groups, Friends, Activity and a big **+** to add an expense.
+- Light and dark themes (following the device's setting by default). English only.
 
 ## Stack
 

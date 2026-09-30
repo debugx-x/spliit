@@ -23,6 +23,7 @@ export async function listNotifications(userId: string) {
   })
   return notifications.map((notification) => ({
     id: notification.id,
+    actorName: notification.actorName,
     text: describeNotification(notification),
     path: notificationPath(notification),
     createdAt: notification.createdAt,

@@ -64,19 +64,23 @@ export function ExpenseCard({
     <div
       key={expense.id}
       className={cn(
-        'flex justify-between sm:mx-6 px-4 sm:rounded-lg sm:pr-2 sm:pl-4 py-4 text-sm cursor-pointer hover:bg-accent gap-1 items-stretch',
+        'flex justify-between sm:mx-4 px-4 sm:rounded-2xl sm:pr-2 sm:pl-3 py-3 text-sm cursor-pointer hover:bg-accent gap-1 items-stretch',
         expense.isReimbursement && 'italic',
       )}
       onClick={() => {
         router.push(`/groups/${groupId}/expenses/${expense.id}/edit`)
       }}
     >
-      <CategoryIcon
-        category={expense.category}
-        className="w-4 h-4 mr-2 mt-0.5 text-muted-foreground"
-      />
+      <span className="w-11 h-11 mr-2 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 self-start">
+        <CategoryIcon category={expense.category} className="w-5 h-5" />
+      </span>
       <div className="flex-1">
-        <div className={cn('mb-1', expense.isReimbursement && 'italic')}>
+        <div
+          className={cn(
+            'mb-1 font-semibold text-[15px]',
+            expense.isReimbursement && 'italic font-medium',
+          )}
+        >
           {expense.title}
         </div>
         <div className="text-xs text-muted-foreground">

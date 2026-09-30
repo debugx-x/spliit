@@ -1,5 +1,6 @@
 'use client'
 
+import { Avatar } from '@/components/avatar'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { trpc } from '@/trpc/client'
@@ -86,6 +87,7 @@ function NotificationItem({ notification }: { notification: Notification }) {
       {!notification.read && (
         <span className="w-2 h-2 shrink-0 rounded-full bg-primary" />
       )}
+      <Avatar name={notification.actorName} size="sm" />
       <span className="flex-1">{notification.text}</span>
       <span className="text-xs text-muted-foreground whitespace-nowrap">
         {new Date(notification.createdAt).toLocaleTimeString(locale, {

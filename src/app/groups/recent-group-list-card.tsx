@@ -32,20 +32,19 @@ export function RecentGroupListCard({
 
   return (
     <li key={group.id}>
-      <Button
-        variant="secondary"
-        className="h-fit w-full py-3 rounded-lg border bg-card shadow-sm"
-        asChild
+      <div
+        className="h-full w-full p-4 rounded-2xl border border-border/70 bg-card shadow-[0_6px_20px_-8px_rgba(80,55,10,0.15)] dark:border-border dark:shadow-none hover:bg-accent transition-colors cursor-pointer"
+        onClick={() => router.push(`/groups/${group.id}`)}
       >
-        <div
-          className="text-base"
-          onClick={() => router.push(`/groups/${group.id}`)}
-        >
-          <div className="w-full flex flex-col gap-1">
+        <div className="flex items-start gap-3">
+          <span className="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+            <Users className="w-5 h-5" />
+          </span>
+          <div className="min-w-0 flex-1 flex flex-col gap-1">
             <div className="text-base flex gap-2 justify-between">
               <Link
                 href={`/groups/${group.id}`}
-                className="flex-1 overflow-hidden text-ellipsis"
+                className="flex-1 overflow-hidden text-ellipsis font-bold"
               >
                 {group.name}
               </Link>
@@ -64,7 +63,7 @@ export function RecentGroupListCard({
                   }}
                 >
                   {isStarred ? (
-                    <StarFilledIcon className="w-4 h-4 text-orange-400" />
+                    <StarFilledIcon className="w-4 h-4 text-marigold" />
                   ) : (
                     <Star className="w-4 h-4 text-muted-foreground" />
                   )}
@@ -128,7 +127,7 @@ export function RecentGroupListCard({
             </div>
           </div>
         </div>
-      </Button>
+      </div>
     </li>
   )
 }

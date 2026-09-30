@@ -19,7 +19,7 @@ export function GroupTabs({ groupId, isFriendSet = false }: Props) {
   return (
     <Tabs
       value={value}
-      className="[&>*]:border overflow-x-auto"
+      className="min-w-0 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       onValueChange={(value) => {
         router.push(`/groups/${groupId}/${value}`)
       }}

@@ -5,9 +5,10 @@ import {
   useFormatAmount,
   useLineLabel,
 } from '@/app/friends/friends-list'
+import { AddExpenseDialog } from '@/components/add-expense-dialog'
+import { Avatar } from '@/components/avatar'
 import {
   AddExpenseWithFriendsButton,
-  FriendPicker,
   PickableFriend,
 } from '@/components/friend-picker'
 import { Button } from '@/components/ui/button'
@@ -20,13 +21,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { CurrencyTotal } from '@/lib/friend-balances'
 import { cn, formatCurrency, getCurrencyFromGroup } from '@/lib/utils'
 import { trpc } from '@/trpc/client'
 import { AppRouterOutput } from '@/trpc/routers/_app'
-import { ChevronRight, HandCoins, Loader2, Plus } from 'lucide-react'
+import { ChevronRight, HandCoins, Loader2, Plus, Users } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
+import Image from 'next/image'
 import Link from 'next/link'
 import { ReactNode } from 'react'
 
@@ -35,7 +36,7 @@ type Group = AppRouterOutput['groups']['list']['groups'][number]
 
 // The logged-in homepage, laid out like Splitwise's dashboard: totals, who
 // you owe and who owes you, your groups and recent activity.
-export function Dashboard() {
+export function Dashboard({ displayName }: { displayName: string }) {
   const t = useTranslations('Dashboard')
   const friends = trpc.friends.list.useQuery()
   const groups = trpc.groups.list.useQuery()
@@ -50,22 +51,50 @@ export function Dashboard() {
 
   const pickable = pickableFriends(friends.data.friends)
   const activeGroups = groups.data.groups.filter((g) => !g.archived)
+  const firstName = displayName.trim().split(/\s+/)[0]
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <h1 className="font-bold text-2xl">{t('title')}</h1>
-        <div className="flex gap-2">
-          <AddExpenseDialog friends={pickable} groups={activeGroups} />
-          <SettleUpDialog friends={friends.data.friends} />
-        </div>
-      </div>
+      <h1 className="font-extrabold text-2xl sm:text-3xl tracking-tight">
+        {t('greeting', { name: firstName })}
+      </h1>
 
       {groups.data.groups.length === 0 && friends.data.friends.length === 0 ? (
         <Welcome friends={pickable} />
       ) : (
         <>
-          <Summary totals={friends.data.totals} />
+          <Summary
+            totals={friends.data.totals}
+            actions={
+              <>
+                <AddExpenseDialog
+                  trigger={
+                    <Button
+                      variant="marigold"
+                      size="lg"
+                      className="flex-1 min-w-0 px-3 sm:flex-none sm:px-7"
+                    >
+                      <Plus className="hidden min-[400px]:block w-5 h-5 mr-1 shrink-0" />
+                      <span className="truncate">{t('addExpenseShort')}</span>
+                    </Button>
+                  }
+                />
+                <SettleUpDialog
+                  friends={friends.data.friends}
+                  trigger={
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="flex-1 min-w-0 px-3 sm:flex-none sm:px-7 bg-transparent border-hero-foreground/40 text-hero-foreground hover:bg-hero-foreground/10 hover:text-hero-foreground"
+                    >
+                      <HandCoins className="hidden min-[400px]:block w-5 h-5 mr-1 shrink-0" />
+                      <span className="truncate">{t('settleUp')}</span>
+                    </Button>
+                  }
+                />
+              </>
+            }
+          />
           <div className="grid gap-4 md:grid-cols-2">
             <BalanceColumn
               title={t('youOwe')}
@@ -90,71 +119,94 @@ export function Dashboard() {
   )
 }
 
-// Total balance · You owe · You are owed, one line per currency
-function Summary({ totals }: { totals: CurrencyTotal[] }) {
+// The mint card: overall, you owe / you're owed / hisaab barabar, per
+// currency, with the main actions
+function Summary({
+  totals,
+  actions,
+}: {
+  totals: CurrencyTotal[]
+  actions: ReactNode
+}) {
   const t = useTranslations('Dashboard')
   const locale = useLocale()
   const format = (total: CurrencyTotal, amount: number) =>
     formatCurrency(getCurrencyFromGroup(total), Math.abs(amount), locale)
-  const column = (
-    label: string,
-    render: (total: CurrencyTotal) => ReactNode,
-  ) => (
-    <div className="flex flex-col items-center gap-1 p-3 sm:p-4 text-center">
-      <span className="text-xs uppercase tracking-wide text-muted-foreground">
-        {label}
-      </span>
-      {totals.length === 0 ? (
-        <span className="font-semibold text-muted-foreground">—</span>
-      ) : (
-        totals.map((total) => (
-          <span
-            key={`${total.currencyCode}${total.currency}`}
-            className="whitespace-nowrap text-sm sm:text-base"
-          >
-            {render(total)}
-          </span>
-        ))
-      )}
-    </div>
-  )
+  const nets = totals.map((total) => ({
+    total,
+    net: total.owedToYou - total.youOwe,
+  }))
+  const settled = nets.every(({ net }) => net === 0)
+  const single = nets.length === 1 ? nets[0] : null
+
   return (
-    <Card>
-      <CardContent className="p-0 grid grid-cols-3 divide-x">
-        {column(t('totalBalance'), (total) => {
-          const net = total.owedToYou - total.youOwe
-          return (
-            <span
-              className={cn(
-                'font-semibold',
-                net > 0 && 'text-green-600',
-                net < 0 && 'text-red-600',
-              )}
-            >
-              {net < 0 ? '-' : net > 0 ? '+' : ''}
-              {format(total, net)}
+    <section className="rounded-3xl bg-hero text-hero-foreground p-4 sm:p-6 flex flex-col gap-5">
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+        <div className="flex flex-col gap-1">
+          <span className="text-sm font-semibold text-hero-muted">
+            {settled
+              ? t('overall')
+              : single
+              ? single.net < 0
+                ? t('overallYouOwe')
+                : t('overallYouAreOwed')
+              : t('overall')}
+          </span>
+          {settled ? (
+            <span className="text-3xl sm:text-4xl font-extrabold tracking-tight">
+              {t('settled')}
             </span>
-          )
-        })}
-        {column(t('youOwe'), (total) => (
-          <span
-            className={cn('font-semibold', total.youOwe > 0 && 'text-red-600')}
-          >
-            {format(total, total.youOwe)}
-          </span>
-        ))}
-        {column(t('youAreOwed'), (total) => (
-          <span
-            className={cn(
-              'font-semibold',
-              total.owedToYou > 0 && 'text-green-600',
-            )}
-          >
-            {format(total, total.owedToYou)}
-          </span>
-        ))}
-      </CardContent>
-    </Card>
+          ) : (
+            nets
+              .filter(({ net }) => net !== 0)
+              .map(({ total, net }) => (
+                <span
+                  key={`${total.currencyCode}${total.currency}`}
+                  className={cn(
+                    'font-extrabold tracking-tight tabular-nums',
+                    single ? 'text-4xl sm:text-5xl' : 'text-2xl sm:text-3xl',
+                  )}
+                >
+                  {!single && (
+                    <span className="text-base font-semibold text-hero-muted mr-2">
+                      {net < 0 ? t('youOweShort') : t('youAreOwedShort')}
+                    </span>
+                  )}
+                  {format(total, net)}
+                </span>
+              ))
+          )}
+        </div>
+        {totals.length > 0 && (
+          <dl className="flex gap-6 text-sm">
+            {totals.map((total) => (
+              <div
+                key={`${total.currencyCode}${total.currency}`}
+                className="flex gap-6"
+              >
+                <div>
+                  <dt className="text-hero-muted font-semibold">
+                    {t('youOwe')}
+                  </dt>
+                  <dd className="font-bold tabular-nums">
+                    {format(total, total.youOwe)}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-hero-muted font-semibold">
+                    {t('youAreOwed')}
+                  </dt>
+                  <dd className="font-bold tabular-nums">
+                    {format(total, total.owedToYou)}
+                  </dd>
+                </div>
+              </div>
+            ))}
+          </dl>
+        )}
+      </div>
+      <div className="flex gap-3">{actions}</div>
+    </section>
   )
 }
 
@@ -186,7 +238,7 @@ function BalanceColumn({
   return (
     <Card>
       <CardHeader className="p-4 pb-2">
-        <CardTitle className="text-sm uppercase tracking-wide text-muted-foreground">
+        <CardTitle className="text-sm font-bold text-muted-foreground">
           {title}
         </CardTitle>
       </CardHeader>
@@ -198,9 +250,10 @@ function BalanceColumn({
             {rows.map(({ friend, amounts, lines }) => (
               <li key={friend.key}>
                 <details className="group">
-                  <summary className="list-none cursor-pointer py-2 flex items-center justify-between gap-3">
-                    <span className="min-w-0">
-                      <span className="font-medium truncate block">
+                  <summary className="list-none cursor-pointer py-2.5 flex items-center gap-3">
+                    <Avatar name={friend.displayName} />
+                    <span className="min-w-0 flex-1">
+                      <span className="font-semibold truncate block">
                         {friend.displayName}
                       </span>
                       {amounts.map((amount) => (
@@ -208,7 +261,7 @@ function BalanceColumn({
                           key={`${amount.currencyCode}${amount.currency}`}
                           className={cn(
                             'text-sm block',
-                            sign > 0 ? 'text-green-600' : 'text-red-600',
+                            sign > 0 ? 'text-owed' : 'text-owe',
                           )}
                         >
                           {sign > 0
@@ -223,7 +276,7 @@ function BalanceColumn({
                     {lines.map((line, index) => (
                       <li
                         key={`${line.groupId}-${index}`}
-                        className="py-1 pl-3 flex items-center justify-between gap-3"
+                        className="py-1.5 pl-[3.25rem] flex items-center justify-between gap-3"
                       >
                         <Link
                           href={`/groups/${line.groupId}/balances`}
@@ -234,9 +287,7 @@ function BalanceColumn({
                         <span className="flex items-center gap-2 whitespace-nowrap">
                           <span
                             className={
-                              line.amount > 0
-                                ? 'text-green-600'
-                                : 'text-red-600'
+                              line.amount > 0 ? 'text-owed' : 'text-owe'
                             }
                           >
                             {line.amount > 0
@@ -244,7 +295,7 @@ function BalanceColumn({
                               : t('youOwe', { amount: format(line) })}
                           </span>
                           {line.amount < 0 && (
-                            <Button asChild size="sm" variant="secondary">
+                            <Button asChild size="sm" variant="marigold">
                               <Link href={`/groups/${line.groupId}/balances`}>
                                 {t('pay')}
                               </Link>
@@ -269,7 +320,7 @@ function YourGroups({ groups }: { groups: Group[] }) {
   return (
     <Card>
       <CardHeader className="p-4 pb-2 flex flex-row items-center justify-between space-y-0">
-        <CardTitle className="text-sm uppercase tracking-wide text-muted-foreground">
+        <CardTitle className="text-sm font-bold text-muted-foreground">
           {t('yourGroups')}
         </CardTitle>
         <Link href="/groups" className="text-sm underline">
@@ -290,9 +341,14 @@ function YourGroups({ groups }: { groups: Group[] }) {
               <li key={group.id}>
                 <Link
                   href={`/groups/${group.id}`}
-                  className="py-2 flex items-center justify-between gap-3 text-sm hover:underline underline-offset-4"
+                  className="py-2 flex items-center gap-3 text-sm hover:underline underline-offset-4"
                 >
-                  <span className="truncate">{group.name}</span>
+                  <span className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                    <Users className="w-5 h-5" />
+                  </span>
+                  <span className="truncate flex-1 font-semibold">
+                    {group.name}
+                  </span>
                   <span className="text-muted-foreground whitespace-nowrap">
                     {t('people', { count: group._count.participants })}
                   </span>
@@ -312,7 +368,7 @@ function RecentActivity() {
   return (
     <Card>
       <CardHeader className="p-4 pb-2 flex flex-row items-center justify-between space-y-0">
-        <CardTitle className="text-sm uppercase tracking-wide text-muted-foreground">
+        <CardTitle className="text-sm font-bold text-muted-foreground">
           {t('recentActivity')}
         </CardTitle>
         <Link href="/notifications" className="text-sm underline">
@@ -343,75 +399,15 @@ function RecentActivity() {
   )
 }
 
-function AddExpenseDialog({
-  friends,
-  groups,
-}: {
-  friends: PickableFriend[]
-  groups: Group[]
-}) {
-  const t = useTranslations('Dashboard')
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button>
-          <Plus className="w-4 h-4 mr-2" />
-          {t('addExpense')}
-        </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{t('addExpense')}</DialogTitle>
-          <DialogDescription>{t('addExpenseDescription')}</DialogDescription>
-        </DialogHeader>
-        <Tabs defaultValue="friends">
-          <TabsList className="w-full">
-            <TabsTrigger value="friends" className="flex-1">
-              {t('withFriends')}
-            </TabsTrigger>
-            <TabsTrigger value="group" className="flex-1">
-              {t('inAGroup')}
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="friends" className="pt-2">
-            <FriendPicker friends={friends} />
-          </TabsContent>
-          <TabsContent value="group" className="pt-2">
-            {groups.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                {t('noGroups')}{' '}
-                <Link href="/groups/create" className="underline">
-                  {t('createGroup')}
-                </Link>
-              </p>
-            ) : (
-              <ul className="flex flex-col gap-1 max-h-72 overflow-y-auto">
-                {groups.map((group) => (
-                  <li key={group.id}>
-                    <Button
-                      asChild
-                      variant="ghost"
-                      className="w-full justify-between"
-                    >
-                      <Link href={`/groups/${group.id}/expenses/create`}>
-                        <span className="truncate">{group.name}</span>
-                        <ChevronRight className="w-4 h-4" />
-                      </Link>
-                    </Button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </TabsContent>
-        </Tabs>
-      </DialogContent>
-    </Dialog>
-  )
-}
-
 // Lines where you owe someone, each leading to the balances page where
 // "Pay with Interac" and "Mark as paid" live
-function SettleUpDialog({ friends }: { friends: Friend[] }) {
+function SettleUpDialog({
+  friends,
+  trigger,
+}: {
+  friends: Friend[]
+  trigger: ReactNode
+}) {
   const t = useTranslations('Dashboard')
   const tFriends = useTranslations('Friends')
   const format = useFormatAmount()
@@ -423,12 +419,7 @@ function SettleUpDialog({ friends }: { friends: Friend[] }) {
   )
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="secondary">
-          <HandCoins className="w-4 h-4 mr-2" />
-          {t('settleUp')}
-        </Button>
-      </DialogTrigger>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{t('settleUp')}</DialogTitle>
@@ -441,9 +432,10 @@ function SettleUpDialog({ friends }: { friends: Friend[] }) {
             {debts.map(({ friend, line }, index) => (
               <li
                 key={`${line.groupId}-${friend.key}-${index}`}
-                className="py-2 flex items-center justify-between gap-3"
+                className="py-2.5 flex items-center gap-3"
               >
-                <span className="min-w-0">
+                <Avatar name={friend.displayName} size="sm" />
+                <span className="min-w-0 flex-1">
                   <span className="block truncate">
                     {t.rich('youOweFriend', {
                       name: friend.displayName,
@@ -457,7 +449,7 @@ function SettleUpDialog({ friends }: { friends: Friend[] }) {
                     {lineLabel(line)}
                   </span>
                 </span>
-                <Button asChild size="sm">
+                <Button asChild size="sm" variant="marigold">
                   <Link href={`/groups/${line.groupId}/balances`}>
                     {tFriends('pay')}
                   </Link>
@@ -475,13 +467,20 @@ function Welcome({ friends }: { friends: PickableFriend[] }) {
   const t = useTranslations('Dashboard')
   return (
     <Card>
-      <CardContent className="p-6 flex flex-col items-center gap-3 text-center">
-        <h2 className="text-lg font-semibold">{t('welcomeTitle')}</h2>
+      <CardContent className="p-6 sm:p-8 flex flex-col items-center gap-3 text-center">
+        <Image
+          src="/logo/128x128.png"
+          width={64}
+          height={64}
+          alt=""
+          className="rounded-2xl"
+        />
+        <h2 className="text-xl font-extrabold">{t('welcomeTitle')}</h2>
         <p className="text-sm text-muted-foreground max-w-md">
           {t('welcomeText')}
         </p>
         <div className="flex flex-wrap justify-center gap-2">
-          <Button asChild>
+          <Button asChild variant="marigold">
             <Link href="/groups/create">{t('createGroup')}</Link>
           </Button>
           <AddExpenseWithFriendsButton friends={friends} variant="secondary" />
