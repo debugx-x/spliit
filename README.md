@@ -1,116 +1,134 @@
-[<img alt="Spliit" height="60" src="https://github.com/spliit-app/spliit/blob/main/public/logo-with-text.png?raw=true" />](https://spliit.app)
+<p align="center">
+  <img alt="Split Karega" src="public/banner.png" width="600" />
+</p>
 
-Spliit is a free and open source alternative to Splitwise. You can either use the official instance at [Spliit.app](https://spliit.app), or deploy your own instance:
+<p align="center">
+  <strong>Split karega?</strong> A free, unlimited Splitwise for your friend group.<br />
+  <a href="https://split-karega.vercel.app">split-karega.vercel.app</a>
+</p>
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fspliit-app%2Fspliit&project-name=my-spliit-instance&repository-name=my-spliit-instance&stores=%5B%7B%22type%22%3A%22postgres%22%7D%5D&)
+Split Karega keeps track of who paid and who owes whom, in groups (trips, households, events) and in one-off expenses with friends. It has no ads, no paywall and no limits, and is built to be hosted for free on Vercel's Hobby plan by one person for their friends.
+
+It is a fork of [Spliit](https://github.com/spliit-app/spliit) by Sebastien Castiel. It adds accounts, members-only groups, a friends view, a Splitwise-style dashboard, settling up with Interac e-Transfer and notifications.
 
 ## Features
 
-- [x] Create a group and share it with friends
-- [x] Add expenses with one or more friends outside groups
-- [x] Dashboard: who you owe and who owes you, across groups and friends
-- [x] Create expenses with description
-- [x] Display group balances
-- [x] Create reimbursement expenses
-- [x] Progressive Web App
-- [x] Select all/no participant for expenses
-- [x] Split expenses unevenly [(#6)](https://github.com/spliit-app/spliit/issues/6)
-- [x] Mark a group as favorite [(#29)](https://github.com/spliit-app/spliit/issues/29)
-- [x] Tell the application who you are when opening a group [(#7)](https://github.com/spliit-app/spliit/issues/7)
-- [x] Assign a category to expenses [(#35)](https://github.com/spliit-app/spliit/issues/35)
-- [x] Search for expenses in a group [(#51)](https://github.com/spliit-app/spliit/issues/51)
-- [x] Upload and attach images to expenses [(#63)](https://github.com/spliit-app/spliit/issues/63)
-- [x] Create expense by scanning a receipt [(#23)](https://github.com/spliit-app/spliit/issues/23)
+**Groups and friends**
 
-### Possible incoming features
+- Groups for trips, households or events. The group's link is the invite: people open it, log in and join as one of the participants, or add themselves.
+- Add friends to a group directly by name or Unique ID. The group then shows up in their "My groups".
+- Expenses with one or more friends **outside groups** ("Add expense" on the dashboard or the Friends page).
+- **Dashboard** (the homepage when logged in): total balance, "You owe" and "You are owed" per friend, your groups, recent activity, and quick "Add an expense" and "Settle up" buttons.
+- **Friends** page: what each friend owes you, or you owe them, across all your groups, per currency.
 
-- [ ] Ability to create recurring expenses [(#5)](https://github.com/spliit-app/spliit/issues/5)
-- [ ] Import expenses from Splitwise [(#22)](https://github.com/spliit-app/spliit/issues/22)
+**Expenses**
+
+- Split evenly, by shares, by percentage or by amount. Includes reimbursements, categories, notes, dates and recurring expenses.
+- Expenses in another currency, converted to the group's currency.
+- Search, activity log, stats, and CSV/JSON export per group.
+
+**Settling up**
+
+- Suggested reimbursements per group, so only a few payments settle everyone.
+- **Pay with Interac:** shows the friend's Interac e-Transfer email, the amount and a message to copy into your bank app, then records the payment in one tap. Each user sets their Interac email in their profile; the login email is never shown to others.
+
+**Notifications**
+
+- A bell in the header for payments, new expenses, changes and being added to a group.
+- An optional **daily email summary**. Each user chooses in their profile what it includes.
+
+**Accounts**
+
+- Sign up with a display name, a Unique ID and an email. Groups are members-only.
+- "Forgot password?" by email, and login rate limiting.
+- Installable as an app (PWA), with light and dark themes. English only.
 
 ## Stack
 
-- [Next.js](https://nextjs.org/) for the web application
-- [TailwindCSS](https://tailwindcss.com/) for the styling
-- [shadcn/UI](https://ui.shadcn.com/) for the UI components
-- [Prisma](https://prisma.io) to access the database
-- [Vercel](https://vercel.com/) for hosting (application and database)
-
-## Contribute
-
-The project is open to contributions. Feel free to open an issue or even a pull-request!
-Join the discussion in [the Spliit Discord server](https://discord.gg/YSyVXbwvSY).
-
-If you want to contribute financially and help us keep the application free and without ads, you can also:
-
-- 💜 [Sponsor me (Sebastien)](https://github.com/sponsors/scastiel), or
-- 💙 [Make a small one-time donation](https://donate.stripe.com/28o3eh96G7hH8k89Ba).
-
-### Language
-
-Split Karega is English-only (`messages/en-US.json`). Upstream Spliit's translations were removed because the new screens (accounts, groups membership, friends, Interac) exist only in English. To add a language back, add `messages/<locale>.json` and list the locale in `src/i18n/request.ts`.
+- [Next.js](https://nextjs.org/) (App Router), React and [tRPC](https://trpc.io/)
+- [Prisma](https://prisma.io) with PostgreSQL
+- [TailwindCSS](https://tailwindcss.com/) and [shadcn/ui](https://ui.shadcn.com/)
+- [Nodemailer](https://nodemailer.com/) for email (any SMTP server, e.g. Gmail)
+- [Vercel](https://vercel.com/) for hosting and the daily cron job, and GitHub Actions for CI and backups
 
 ## Run locally
 
-1. Clone the repository (or fork it if you intend to contribute)
-2. Start a PostgreSQL server. You can run `./scripts/start-local-db.sh` if you don’t have a server already.
-3. Copy the file `.env.example` as `.env`, and set `JWT_SECRET` to a random string of at least 32 characters (e.g. `openssl rand -hex 32`)
-4. Run `npm install` to install dependencies. This will also apply database migrations and update Prisma Client.
-5. Run `npm run dev` to start the development server
+1. Clone the repository.
+2. Start PostgreSQL. `./scripts/start-local-db.sh` runs one in Docker if you don't have one.
+3. Copy `.env.example` to `.env` and set `JWT_SECRET` to a random string of at least 32 characters (`openssl rand -hex 32`).
+4. `npm install`. This also applies the database migrations and generates the Prisma client.
+5. `npm run dev`, then open http://localhost:3000 and sign up.
 
-## Run in a container
+Without email settings, password reset links and notification summaries are printed to the server console. Open http://localhost:3000/api/cron/notifications to send the summaries on demand.
 
-1. Run `npm run build-image` to build the docker image from the Dockerfile
-2. Copy the file `container.env.example` as `container.env`, and set `JWT_SECRET` (see above)
-3. Run `npm run start-container` to start the postgres and the spliit2 containers
-4. You can access the app by browsing to http://localhost:3000
+### Checks
+
+These are the same checks CI runs on every pull request (`.github/workflows/ci.yml`):
+
+```bash
+npm run check-types        # TypeScript
+npm run lint               # ESLint
+npm run check-formatting   # Prettier (npm run prettier to fix)
+npm test                   # Jest
+```
 
 ## Deploy on Vercel
 
-1. Create a PostgreSQL database (e.g. Vercel → Storage → Prisma Postgres or Neon) and connect it to the project.
-2. Set these environment variables for **both Production and Preview**:
-   - `POSTGRES_URL`: the **direct** connection string (`postgres://…`), not a `prisma+postgres://` Accelerate URL
-   - `JWT_SECRET`: a random string of at least 32 characters (e.g. `openssl rand -hex 32`)
-3. Deploy. Installing dependencies runs `prisma migrate deploy`, so every build (previews included) applies pending migrations to the database it is configured with. Use a separate database for Preview so that unmerged branches can't migrate your production data.
+1. Import the repository in Vercel and connect a PostgreSQL database (e.g. Storage → Prisma Postgres, or Neon).
+2. Set the environment variables below, then deploy.
 
-The database must either be empty or have been created by `prisma migrate`. A database created with `prisma db push` has no migration history and `migrate deploy` will fail with `P3005`; reset it (`npx prisma migrate reset`, which deletes all data) or [baseline it](https://www.prisma.io/docs/orm/prisma-migrate/workflows/baselining).
+Every build runs `prisma migrate deploy` (via `npm install`), so each deployment applies pending migrations to its database. Previews can share the production database, as split-karega.vercel.app does (keep migrations additive), or use a separate one so unmerged branches never touch production data.
 
-## Password reset emails
+The database must be empty or created by `prisma migrate`. A database made with `prisma db push` fails with `P3005`: reset it or [baseline it](https://www.prisma.io/docs/orm/prisma-migrate/workflows/baselining).
 
-"Forgot password?" emails a one-time reset link (valid for 1 hour). Any SMTP server works; a free Gmail account (up to 500 emails a day) is enough for a friend group. Use a new Gmail account just for the app, so your personal address isn't the sender:
+| Variable                            | Needed for                                | Where                        | Value                                                                        |
+| ----------------------------------- | ----------------------------------------- | ---------------------------- | ---------------------------------------------------------------------------- |
+| `POSTGRES_URL`                      | everything                                | Production + Preview         | the **direct** `postgres://…` connection string (not `prisma+postgres://`)   |
+| `JWT_SECRET`                        | logins                                    | Production + Preview, secret | 32+ random characters (`openssl rand -hex 32`)                               |
+| `NEXT_PUBLIC_BASE_URL`              | links in emails and link previews         | Production only              | e.g. `https://split-karega.vercel.app` (previews use their own address)      |
+| `SMTP_URL`                          | password reset and summary emails         | Production + Preview, secret | e.g. `smtps://splitkarega.app%40gmail.com:<app-password>@smtp.gmail.com:465` |
+| `EMAIL_FROM`                        | email sender name (optional)              | Production + Preview         | e.g. `Split Karega <splitkarega.app@gmail.com>`                              |
+| `CRON_SECRET`                       | the daily summary                         | Production, secret           | 32+ random characters                                                        |
+| `NEXT_PUBLIC_DEFAULT_CURRENCY_CODE` | default currency of new groups (optional) | any                          | e.g. `CAD`                                                                   |
 
-1. Create the Gmail account (e.g. `splitkarega.app@gmail.com`), turn on **2-Step Verification**, then create an **App password** (Google Account → Security → App passwords), e.g. named "Split Karega".
-2. Set these environment variables (in Vercel: Settings → Environment Variables, for Production and Preview):
-   - `SMTP_URL` (a secret): `smtps://splitkarega.app%40gmail.com:<app-password>@smtp.gmail.com:465` (write `@` in the address as `%40`, and remove the spaces from the app password)
-   - `EMAIL_FROM` (optional): e.g. `Split Karega <splitkarega.app@gmail.com>`
-   - `NEXT_PUBLIC_BASE_URL` (Production only): your site's address, e.g. `https://split-karega.vercel.app`, so links in emails point to it. Previews use their own address.
-3. Redeploy.
+### Email (Gmail)
 
-Without `SMTP_URL`, the forgot password page says that reset by email isn't set up. In local development, the email is printed to the server console instead. Reset requests are limited to 5 per IP address per 15 minutes, and one email per account per minute.
+Password reset and the daily summary are sent over SMTP. A free Gmail account allows up to 500 emails a day, which is plenty for a friend group. Use a Gmail account just for the app, so your personal address isn't the sender:
 
-## Notifications
+1. Create the account (e.g. `splitkarega.app@gmail.com`) and turn on **2-Step Verification**.
+2. Go to Google Account → Security → **App passwords** and create one, e.g. named "Split Karega".
+3. Set `SMTP_URL`:
+   - write the `@` of the address as `%40`
+   - remove the spaces from the app password
+4. Optionally set `EMAIL_FROM`. Then redeploy.
 
-Payments, new expenses, changes to expenses and being added to a group create notifications for the people involved who have an account (never for the person who made the change):
+Emails from a new address may land in Spam at first. The "Check your email" page asks people to mark them "Not spam", which teaches Gmail to trust the address.
 
-- **In the app:** the bell in the header shows the number of unread notifications; `/notifications` lists them.
-- **By email:** a daily summary (at most one email a day, only when something happened). Each user picks the kinds of updates they get by email in their profile; all are on by default.
+Without `SMTP_URL`, the "Forgot password?" page says reset by email isn't set up, and summaries aren't sent.
 
-The summary is sent by a [Vercel Cron job](https://vercel.com/docs/cron-jobs) (`vercel.json`) calling `/api/cron/notifications` every day at 13:00 UTC (around 9 am Eastern), using the same email setup as password reset. To protect that endpoint:
+- **Reset links:** valid for 1 hour, and work once.
+- **Limits:** 5 reset requests per IP address per 15 minutes, and one email per account per minute.
 
-1. Set `CRON_SECRET` in Vercel (Production, as a secret) to a random string of at least 32 characters, e.g. from `openssl rand -hex 32`. Vercel sends it with each cron request.
-2. Redeploy. The job appears under Settings → Cron Jobs, where **Run** sends the summary right away.
+### Notifications and the daily summary
 
-Locally, without `CRON_SECRET`, open http://localhost:3000/api/cron/notifications to send the summaries.
+- **Who gets them:** everyone involved in the change who has an account, except the person who made it.
+- **In the app:** the bell shows them right away.
+- **The daily summary:**
+  - Sent by a [Vercel Cron job](https://vercel.com/docs/cron-jobs) (`vercel.json`) that calls `/api/cron/notifications` every day at 13:00 UTC, around 9 am Eastern. On Hobby it runs sometime within that hour.
+  - People only get it on days something happened. Each person's profile checkboxes decide what's included, and all are on by default.
+- **Securing the endpoint:** set `CRON_SECRET` and redeploy. Vercel sends the secret with each cron request, and anything else gets `401`.
+- **Sending it now:** Settings → **Cron Jobs** → **Run**.
 
 ## Backups
 
-The [Database backup](.github/workflows/db-backup.yml) workflow runs every night: it dumps the database with `pg_dump`, encrypts the dump with a passphrase and keeps it as a workflow artifact for 30 days. Encryption matters because artifacts of a public repository can be downloaded by any GitHub user.
+The [Database backup](.github/workflows/db-backup.yml) workflow runs every night. It dumps the database with `pg_dump`, encrypts the dump with a passphrase, and keeps it as a workflow artifact for 30 days. Encryption matters because anyone on GitHub can download the artifacts of a public repository.
 
-Setup (GitHub → repository **Settings** → **Secrets and variables** → **Actions** → **New repository secret**):
+Setup: in GitHub, go to **Settings** → **Secrets and variables** → **Actions** and add:
 
-- `BACKUP_DATABASE_URL`: the direct `postgres://…` connection string (same as `POSTGRES_URL` in Vercel)
-- `BACKUP_PASSPHRASE`: a long random passphrase. Store it in your password manager: without it the backups can't be read.
+- `BACKUP_DATABASE_URL`: the direct `postgres://…` connection string (the same as `POSTGRES_URL`)
+- `BACKUP_PASSPHRASE`: a long random passphrase. Keep it in your password manager: without it, the backups can't be read.
 
-To take a backup right away, open **Actions** → **Database backup** → **Run workflow**. If a scheduled run fails, GitHub emails you.
+To back up right away, go to **Actions** → **Database backup** → **Run workflow**. GitHub emails you if a scheduled run fails.
 
 To restore, download the artifact (a zip containing `backup.dump.gpg`) from the workflow run, then:
 
@@ -119,23 +137,28 @@ gpg --decrypt backup.dump.gpg > backup.dump   # asks for BACKUP_PASSPHRASE
 pg_restore --clean --if-exists --no-owner --no-privileges -d "<postgres://… URL of the target database>" backup.dump
 ```
 
-`pg_restore` replaces the tables in the target database with the backup's contents, so try it on an empty database first.
+`pg_restore` replaces the tables in the target database, so try it on an empty database first.
+
+## Run in a container
+
+1. `npm run build-image` builds the Docker image.
+2. Copy `container.env.example` to `container.env` and set `JWT_SECRET`.
+3. `npm run start-container` starts PostgreSQL and the app on http://localhost:3000.
+
+Pushing a git tag publishes an image to the GitHub Container Registry (`.github/workflows/cd.yml`).
 
 ## Health check
 
-The application has a health check endpoint that can be used to check if the application is running and if the database is accessible.
+- `GET /api/health` or `GET /api/health/readiness`: the app is ready, including the database connection.
+- `GET /api/health/liveness`: the app is running.
 
-- `GET /api/health/readiness` or `GET /api/health` - Check if the application is ready to serve requests, including database connectivity.
-- `GET /api/health/liveness` - Check if the application is running, but not necessarily ready to serve requests.
+## Optional features
 
-## Opt-in features
+These come from Spliit and are off by default.
 
-### Expense documents
+### Receipt photos
 
-Spliit offers users to upload images (to an AWS S3 bucket) and attach them to expenses. To enable this feature:
-
-- Follow the instructions in the _S3 bucket_ and _IAM user_ sections of [next-s3-upload](https://next-s3-upload.codingvalue.com/setup#s3-bucket) to create and set up an S3 bucket where images will be stored.
-- Update your environments variables with appropriate values:
+Attach images to expenses, stored in an S3 bucket (AWS or any S3-compatible provider). Create a bucket and an IAM user as described in [next-s3-upload](https://next-s3-upload.codingvalue.com/setup#s3-bucket), then set:
 
 ```.env
 NEXT_PUBLIC_ENABLE_EXPENSE_DOCUMENTS=true
@@ -143,38 +166,28 @@ S3_UPLOAD_KEY=AAAAAAAAAAAAAAAAAAAA
 S3_UPLOAD_SECRET=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 S3_UPLOAD_BUCKET=name-of-s3-bucket
 S3_UPLOAD_REGION=us-east-1
-```
-
-You can also use other S3 providers by providing a custom endpoint:
-
-```.env
+# For other S3 providers:
 S3_UPLOAD_ENDPOINT=http://localhost:9000
 ```
 
-### Create expense from receipt
+### Create an expense from a receipt, and guess the category
 
-You can offer users to create expense by uploading a receipt. This feature relies on [OpenAI GPT-4 with Vision](https://platform.openai.com/docs/guides/vision) and a public S3 storage endpoint.
-
-To enable the feature:
-
-- You must enable expense documents feature as well (see section above). That might change in the future, but for now we need to store images to make receipt scanning work.
-- Subscribe to OpenAI API and get access to GPT 4 with Vision (you might need to buy credits in advance).
-- Update your environment variables with appropriate values:
+Both use the OpenAI API, which needs paid credits. Receipt scanning also needs receipt photos (above).
 
 ```.env
 NEXT_PUBLIC_ENABLE_RECEIPT_EXTRACT=true
-OPENAI_API_KEY=XXXXXXXXXXXXXXXXXXXXXXXXXXXX
-```
-
-### Deduce category from title
-
-You can offer users to automatically deduce the expense category from the title. Since this feature relies on a OpenAI subscription, follow the signup instructions above and configure the following environment variables:
-
-```.env
 NEXT_PUBLIC_ENABLE_CATEGORY_EXTRACT=true
 OPENAI_API_KEY=XXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
 
-## License
+## Project notes
+
+- **Language:** English only (`messages/en-US.json`). To add one, add `messages/<locale>.json` and list it in `src/i18n/request.ts`.
+- **Logo:** the SVG masters are in `public/brand/`. `npm run generate-logos` renders the favicon, app icons, splash and social banner from them.
+- **Changes:** see [CHANGELOG.md](./CHANGELOG.md).
+
+## Credits and license
+
+Split Karega is based on [Spliit](https://github.com/spliit-app/spliit) by [Sebastien Castiel](https://github.com/scastiel) and its contributors. If you'd like to support the original project, you can [sponsor Sebastien](https://github.com/sponsors/scastiel).
 
 MIT, see [LICENSE](./LICENSE).
