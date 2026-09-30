@@ -44,12 +44,12 @@ export function ProfileForm({
         <form action={formAction}>
           <CardContent className="space-y-4">
             {state?.error && (
-              <div className="p-3 text-sm text-red-500 bg-red-100 rounded-md">
+              <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-xl">
                 {state.error}
               </div>
             )}
             {state?.success && (
-              <div className="p-3 text-sm text-green-700 bg-green-100 rounded-md">
+              <div className="p-3 text-sm text-owed bg-owed/10 rounded-xl">
                 {state.success}
               </div>
             )}
@@ -156,9 +156,9 @@ export function ProfileForm({
         </form>
       </Card>
 
-      <Card className="border-red-200">
+      <Card className="border-destructive/40">
         <CardHeader>
-          <CardTitle className="text-red-600">Danger Zone</CardTitle>
+          <CardTitle className="text-destructive">Danger Zone</CardTitle>
         </CardHeader>
         <CardContent>
           <form action={logoutAction}>

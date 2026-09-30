@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useActionState } from 'react'
 import { forgotPasswordAction } from '../password-reset-actions'
@@ -24,7 +25,14 @@ export default function ForgotPasswordPage() {
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
       <Card className="w-full max-w-md">
-        <CardHeader>
+        <CardHeader className="items-center text-center">
+          <Image
+            src="/logo/128x128.png"
+            width={56}
+            height={56}
+            alt=""
+            className="rounded-2xl mb-2"
+          />
           <CardTitle className="text-2xl">Forgot your password?</CardTitle>
           <CardDescription>
             Enter your email or Unique ID and we&apos;ll email you a link to
@@ -54,7 +62,7 @@ export default function ForgotPasswordPage() {
           <form action={formAction}>
             <CardContent className="space-y-4">
               {state?.error && (
-                <div className="p-3 text-sm text-red-500 bg-red-100 rounded-md">
+                <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-xl">
                   {state.error}
                 </div>
               )}

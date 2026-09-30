@@ -1,5 +1,6 @@
 'use client'
 
+import { Avatar } from '@/components/avatar'
 import { BalancesSummary } from '@/components/balances-summary'
 import {
   AddExpenseWithFriendsButton,
@@ -145,7 +146,8 @@ function FriendCard({ friend }: { friend: Friend }) {
       <details className="group">
         <summary className="list-none cursor-pointer">
           <CardHeader className="p-4 flex flex-row items-center justify-between gap-4 space-y-0">
-            <div className="min-w-0">
+            <Avatar name={name} />
+            <div className="min-w-0 flex-1">
               <CardTitle className="text-base truncate">
                 {name}
                 {friend.uniqueId && (
@@ -170,9 +172,7 @@ function FriendCard({ friend }: { friend: Friend }) {
                   friend.amounts.map((amount) => (
                     <span
                       key={`${amount.currencyCode}${amount.currency}`}
-                      className={
-                        amount.amount > 0 ? 'text-green-600' : 'text-red-600'
-                      }
+                      className={amount.amount > 0 ? 'text-owed' : 'text-owe'}
                     >
                       {amount.amount > 0
                         ? t('owesYou', { amount: format(amount) })
@@ -199,11 +199,7 @@ function FriendCard({ friend }: { friend: Friend }) {
                   </Link>
                 </Button>
                 <span className="flex items-center gap-3">
-                  <span
-                    className={
-                      line.amount > 0 ? 'text-green-600' : 'text-red-600'
-                    }
-                  >
+                  <span className={line.amount > 0 ? 'text-owed' : 'text-owe'}>
                     {line.amount > 0
                       ? t('owesYou', { amount: format(line) })
                       : t('youOwe', { amount: format(line) })}

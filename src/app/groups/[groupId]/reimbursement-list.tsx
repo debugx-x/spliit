@@ -1,4 +1,5 @@
 import { PayWithInterac } from '@/app/groups/[groupId]/pay-with-interac'
+import { Avatar } from '@/components/avatar'
 import { Button } from '@/components/ui/button'
 import { Reimbursement } from '@/lib/balances'
 import { Currency } from '@/lib/currency'
@@ -40,24 +41,26 @@ export function ReimbursementList({
 
   const getParticipant = (id: string) => participants.find((p) => p.id === id)
   return (
-    <div className="text-sm">
+    <ul className="text-sm divide-y">
       {reimbursements.map((reimbursement, index) => (
-        <div className="py-4 flex justify-between" key={index}>
-          <div className="flex flex-col gap-1 items-start sm:flex-row sm:items-baseline sm:gap-4">
-            <div>
+        <li className="py-4 flex flex-col gap-3" key={index}>
+          <div className="flex items-center gap-3">
+            <Avatar
+              name={getParticipant(reimbursement.from)?.name ?? '?'}
+              size="sm"
+            />
+            <div className="flex-1 min-w-0">
               {t.rich('owes', {
                 from: getParticipant(reimbursement.from)?.name ?? '',
                 to: getParticipant(reimbursement.to)?.name ?? '',
                 strong: (chunks) => <strong>{chunks}</strong>,
               })}
             </div>
-            <Button variant="link" asChild className="-mx-4 -my-3">
-              <Link
-                href={`/groups/${groupId}/expenses/create?reimbursement=yes&from=${reimbursement.from}&to=${reimbursement.to}&amount=${reimbursement.amount}`}
-              >
-                {t('markAsPaid')}
-              </Link>
-            </Button>
+            <div className="font-bold text-base tabular-nums whitespace-nowrap">
+              {formatCurrency(currency, reimbursement.amount, locale)}
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2 pl-11">
             {interacPayee(reimbursement) && (
               <PayWithInterac
                 groupId={groupId}
@@ -68,10 +71,16 @@ export function ReimbursementList({
                 currency={currency}
               />
             )}
+            <Button variant="outline" size="sm" asChild>
+              <Link
+                href={`/groups/${groupId}/expenses/create?reimbursement=yes&from=${reimbursement.from}&to=${reimbursement.to}&amount=${reimbursement.amount}`}
+              >
+                {t('markAsPaid')}
+              </Link>
+            </Button>
           </div>
-          <div>{formatCurrency(currency, reimbursement.amount, locale)}</div>
-        </div>
+        </li>
       ))}
-    </div>
+    </ul>
   )
 }

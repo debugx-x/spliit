@@ -1,5 +1,6 @@
 'use client'
 
+import { Avatar } from '@/components/avatar'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -116,13 +117,14 @@ export function FriendPicker({ friends }: { friends: PickableFriend[] }) {
         <ul className="flex flex-col gap-1 max-h-64 overflow-y-auto">
           {listed.map((friend) => (
             <li key={friend.userId}>
-              <label className="flex items-center gap-3 rounded-md px-2 py-2 text-sm cursor-pointer hover:bg-accent">
+              <label className="flex items-center gap-3 rounded-xl px-2 py-2 min-h-12 text-sm cursor-pointer hover:bg-accent">
                 <input
                   type="checkbox"
                   className="h-4 w-4 accent-primary"
                   checked={selected.includes(friend.userId)}
                   onChange={() => toggle(friend.userId)}
                 />
+                <Avatar name={friend.displayName} size="sm" />
                 <span className="truncate">{friend.displayName}</span>
                 {friend.uniqueId && (
                   <span className="text-muted-foreground truncate">

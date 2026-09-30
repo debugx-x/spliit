@@ -411,8 +411,11 @@ export function GroupForm({
           </>
         )}
 
-        <div className="flex mt-4 gap-2">
+        {/* Phones: a full-width Save bar stuck to the bottom of the screen */}
+        <div className="sticky bottom-0 z-30 -mx-4 mt-4 flex items-center gap-2 border-t bg-background/95 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
           <SubmitButton
+            size="lg"
+            className="flex-1 sm:flex-none"
             loadingContent={t(group ? 'Settings.saving' : 'Settings.creating')}
             onClick={updateActiveUser}
           >

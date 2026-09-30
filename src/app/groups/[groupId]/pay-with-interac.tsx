@@ -71,7 +71,7 @@ export function PayWithInterac({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="link" className="-mx-4 -my-3">
+        <Button variant="marigold" size="sm">
           {t('button')}
         </Button>
       </DialogTrigger>

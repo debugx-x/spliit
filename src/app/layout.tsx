@@ -1,20 +1,26 @@
 import { ApplePwaSplash } from '@/app/apple-pwa-splash'
-import { NotificationBell } from '@/components/notification-bell'
+import { BottomNav } from '@/components/bottom-nav'
 import { ProgressBar } from '@/components/progress-bar'
+import { SiteHeader } from '@/components/site-header'
 import { ThemeProvider } from '@/components/theme-provider'
-import { ThemeToggle } from '@/components/theme-toggle'
-import { Button } from '@/components/ui/button'
 import { Toaster } from '@/components/ui/toaster'
 import { getSession } from '@/lib/auth'
 import { env } from '@/lib/env'
+import { cn } from '@/lib/utils'
 import { TRPCProvider } from '@/trpc/client'
 import type { Metadata, Viewport } from 'next'
-import { NextIntlClientProvider, useTranslations } from 'next-intl'
+import { NextIntlClientProvider } from 'next-intl'
 import { getLocale, getMessages } from 'next-intl/server'
-import Image from 'next/image'
-import Link from 'next/link'
+import { Plus_Jakarta_Sans } from 'next/font/google'
 import { Suspense } from 'react'
 import './globals.css'
+
+// Self-hosted at build time: no request to Google when the app runs
+const fontSans = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   metadataBase: new URL(env.NEXT_PUBLIC_BASE_URL),
@@ -49,7 +55,12 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#047857',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#FFF8EC' },
+    { media: '(prefers-color-scheme: dark)', color: '#17130D' },
+  ],
+  // Lets the tab bar sit above the iPhone home indicator
+  viewportFit: 'cover',
 }
 
 function Content({
@@ -57,95 +68,20 @@ function Content({
   session,
 }: {
   children: React.ReactNode
-  session: any
+  session: { displayName: string } | null
 }) {
-  const t = useTranslations()
   return (
     <TRPCProvider>
-      <header className="fixed top-0 left-0 right-0 h-16 flex justify-between bg-white dark:bg-gray-950 bg-opacity-50 dark:bg-opacity-50 p-2 border-b backdrop-blur-sm z-50">
-        <Link
-          className="flex items-center gap-2 hover:scale-105 transition-transform"
-          href="/"
-          aria-label="Split Karega"
-        >
-          <h1 className="flex items-center gap-2">
-            <Image
-              src="/logo/128x128.png"
-              className="m-1 rounded-lg"
-              width={35}
-              height={35}
-              alt=""
-            />
-            {/* Logged-in menus are wider: show just the icon on narrow phones */}
-            <span
-              className={`${
-                session ? 'hidden sm:inline' : ''
-              } font-bold text-lg tracking-tight whitespace-nowrap`}
-            >
-              Split <span className="text-primary">Karega</span>
-            </span>
-          </h1>
-        </Link>
-        <div role="navigation" aria-label="Menu" className="flex">
-          <ul className="flex items-center text-sm">
-            <li>
-              <Button
-                variant="ghost"
-                size="sm"
-                asChild
-                className="-my-3 text-primary"
-              >
-                <Link href="/groups">{t('Header.groups')}</Link>
-              </Button>
-            </li>
-            {session && (
-              <li>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  asChild
-                  className="-my-3 text-primary"
-                >
-                  <Link href="/friends">{t('Header.friends')}</Link>
-                </Button>
-              </li>
-            )}
-            {session && (
-              <li>
-                <NotificationBell />
-              </li>
-            )}
-            {session ? (
-              <li>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  asChild
-                  className="-my-3 text-primary"
-                >
-                  <Link href="/profile">{session.displayName}</Link>
-                </Button>
-              </li>
-            ) : (
-              <li>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  asChild
-                  className="-my-3 text-primary"
-                >
-                  <Link href="/login">Login</Link>
-                </Button>
-              </li>
-            )}
-            <li>
-              <ThemeToggle />
-            </li>
-          </ul>
-        </div>
-      </header>
-
-      <div className="pt-16 flex-1 flex flex-col">{children}</div>
+      <SiteHeader
+        session={session ? { displayName: session.displayName } : null}
+      />
+      {/* Logged in, phones get a bottom tab bar: leave room for it */}
+      <div
+        className={cn('pt-16 flex-1 flex flex-col', session && 'pb-24 md:pb-0')}
+      >
+        {children}
+      </div>
+      {session && <BottomNav />}
       <Toaster />
     </TRPCProvider>
   )
@@ -160,13 +96,13 @@ export default async function RootLayout({
   const messages = await getMessages()
   const session = await getSession()
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <ApplePwaSplash icon="/logo-with-text.png" color="#027756" />
-      <body className="min-h-[100dvh] flex flex-col items-stretch bg-slate-50 bg-opacity-30 dark:bg-background">
+    <html lang={locale} className={fontSans.variable} suppressHydrationWarning>
+      <ApplePwaSplash icon="/logo-with-text.png" color="#08775A" />
+      <body className="min-h-[100dvh] flex flex-col items-stretch bg-background font-sans">
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider
             attribute="class"
-            defaultTheme="dark"
+            defaultTheme="system"
             enableSystem
             disableTransitionOnChange
           >

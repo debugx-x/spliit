@@ -34,7 +34,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
           <input type="hidden" name="token" value={token} />
           <CardContent className="space-y-4">
             {state?.error && (
-              <div className="p-3 text-sm text-red-500 bg-red-100 rounded-md">
+              <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-xl">
                 {state.error}{' '}
                 {state.error.includes('Request a new one') && (
                   <Link href="/forgot-password" className="underline">
