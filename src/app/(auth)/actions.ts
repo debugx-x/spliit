@@ -1,15 +1,17 @@
 'use server'
 
 import { createSession, safeRedirectPath } from '@/lib/auth'
+import { getClientIp } from '@/lib/client-ip'
 import {
   clearAccountLoginFailures,
+  formatRetryAfter,
   getLoginRetryAfter,
   loginFailureKeys,
   recordLoginFailure,
 } from '@/lib/login-rate-limit'
 import { prisma } from '@/lib/prisma'
+import { passwordSchema } from '@/lib/schemas'
 import { compare, hash } from 'bcryptjs'
-import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
 
@@ -20,7 +22,7 @@ const registerSchema = z.object({
     .min(3, 'Unique ID must be at least 3 characters')
     .regex(/^[a-zA-Z0-9_]+$/, 'Only alphanumeric and underscores allowed'),
   email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: passwordSchema,
 })
 
 // Submitted values (minus the password) are returned with errors so the
@@ -88,18 +90,6 @@ const loginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 })
 
-// The client's IP address for rate limiting. On Vercel these headers are set
-// by the platform (locally, Next.js sets x-forwarded-for to the loopback
-// address). Without them, only per-account limits apply.
-async function getClientIp() {
-  const requestHeaders = await headers()
-  return (
-    requestHeaders.get('x-real-ip') ??
-    requestHeaders.get('x-forwarded-for')?.split(',')[0].trim() ??
-    null
-  )
-}
-
 export async function loginAction(prevState: any, formData: FormData) {
   const values = formValues(formData, ['uniqueId'])
   const parsed = loginSchema.safeParse(Object.fromEntries(formData))
@@ -124,11 +114,10 @@ export async function loginAction(prevState: any, formData: FormData) {
     })
     const retryAfter = await getLoginRetryAfter(failureKeys)
     if (retryAfter > 0) {
-      const minutes = Math.ceil(retryAfter / 60_000)
       return {
-        error: `Too many failed login attempts. Try again in ${minutes} minute${
-          minutes === 1 ? '' : 's'
-        }.`,
+        error: `Too many failed login attempts. ${formatRetryAfter(
+          retryAfter,
+        )}`,
         values,
       }
     }

@@ -223,3 +223,8 @@ export type SplittingOptions = {
   splitMode: SplitMode
   paidFor: ExpenseFormValues['paidFor'] | null
 }
+
+// Rule for new passwords (registration and password reset)
+export const passwordSchema = z
+  .string()
+  .min(6, 'Password must be at least 6 characters')

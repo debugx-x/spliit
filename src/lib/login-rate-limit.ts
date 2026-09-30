@@ -8,6 +8,8 @@ import { prisma } from '@/lib/prisma'
 export const LOGIN_WINDOW_MS = 15 * 60 * 1000
 export const ACCOUNT_FAILURE_LIMIT = 5
 export const IP_FAILURE_LIMIT = 20
+// Password reset emails requested from one IP address per window
+export const RESET_REQUEST_IP_LIMIT = 5
 const RETENTION_MS = 24 * 60 * 60 * 1000
 
 // The keys a login attempt counts against. Existing accounts are keyed by
@@ -30,6 +32,20 @@ export function loginFailureKeys({
   ]
   if (ip) keys.push({ key: `ip:${ip}`, limit: IP_FAILURE_LIMIT })
   return keys
+}
+
+// Password reset requests are counted (every request, not just failures)
+// per IP address, so one visitor can't use up the email quota by cycling
+// through account names. Each account is also limited to one email a minute
+// (see password-reset.ts).
+export function resetRequestKeys(ip: string | null) {
+  return ip ? [{ key: `reset-ip:${ip}`, limit: RESET_REQUEST_IP_LIMIT }] : []
+}
+
+// "Try again in 3 minutes."
+export function formatRetryAfter(retryAfter: number) {
+  const minutes = Math.ceil(retryAfter / 60_000)
+  return `Try again in ${minutes} minute${minutes === 1 ? '' : 's'}.`
 }
 
 // Milliseconds until another attempt is allowed, or 0 if not blocked.
@@ -56,6 +72,7 @@ export async function getLoginRetryAfter(
 }
 
 export async function recordLoginFailure(keys: { key: string }[]) {
+  if (keys.length === 0) return
   await prisma.loginFailure.createMany({
     data: keys.map(({ key }) => ({ key })),
   })
@@ -65,7 +82,8 @@ export async function recordLoginFailure(keys: { key: string }[]) {
   })
 }
 
-// After a successful login, the account starts over (the IP count stays).
+// After a successful login or a password reset, the account starts over
+// (the IP count stays).
 export async function clearAccountLoginFailures(userId: string) {
   await prisma.loginFailure.deleteMany({ where: { key: `user:${userId}` } })
 }

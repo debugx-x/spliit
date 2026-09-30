@@ -72,6 +72,19 @@ Split Karega is English-only (`messages/en-US.json`). Upstream Spliit's translat
 
 The database must either be empty or have been created by `prisma migrate`. A database created with `prisma db push` has no migration history and `migrate deploy` will fail with `P3005`; reset it (`npx prisma migrate reset`, which deletes all data) or [baseline it](https://www.prisma.io/docs/orm/prisma-migrate/workflows/baselining).
 
+## Password reset emails
+
+"Forgot password?" emails a one-time reset link (valid for 1 hour). Any SMTP server works; a free Gmail account (up to 500 emails a day) is enough for a friend group. Use a new Gmail account just for the app, so your personal address isn't the sender:
+
+1. Create the Gmail account (e.g. `splitkarega.app@gmail.com`), turn on **2-Step Verification**, then create an **App password** (Google Account → Security → App passwords), e.g. named "Split Karega".
+2. Set these environment variables (in Vercel: Settings → Environment Variables, for Production and Preview):
+   - `SMTP_URL` (a secret): `smtps://splitkarega.app%40gmail.com:<app-password>@smtp.gmail.com:465` (write `@` in the address as `%40`, and remove the spaces from the app password)
+   - `EMAIL_FROM` (optional): e.g. `Split Karega <splitkarega.app@gmail.com>`
+   - `NEXT_PUBLIC_BASE_URL` (Production only): your site's address, e.g. `https://split-karega.vercel.app`, so links in emails point to it. Previews use their own address.
+3. Redeploy.
+
+Without `SMTP_URL`, the forgot password page says that reset by email isn't set up. In local development, the email is printed to the server console instead. Reset requests are limited to 5 per IP address per 15 minutes, and one email per account per minute.
+
 ## Backups
 
 The [Database backup](.github/workflows/db-backup.yml) workflow runs every night: it dumps the database with `pg_dump`, encrypts the dump with a passphrase and keeps it as a workflow artifact for 30 days. Encryption matters because artifacts of a public repository can be downloaded by any GitHub user.
