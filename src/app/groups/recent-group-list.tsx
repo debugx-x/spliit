@@ -1,5 +1,6 @@
 'use client'
 import { AddGroupByUrlButton } from '@/app/groups/add-group-by-url-button'
+import { BalancesSummary } from '@/components/balances-summary'
 import { Button } from '@/components/ui/button'
 import { trpc } from '@/trpc/client'
 import { AppRouterOutput } from '@/trpc/routers/_app'
@@ -101,7 +102,15 @@ function GroupsPage({ children }: PropsWithChildren) {
           </Button>
         </div>
       </div>
+      <OverallBalances />
       <div>{children}</div>
     </>
   )
+}
+
+// Totals across all groups; hidden until there's something to show.
+function OverallBalances() {
+  const { data } = trpc.friends.list.useQuery()
+  if (!data || data.friends.length === 0) return null
+  return <BalancesSummary totals={data.totals} showFriendsLink />
 }

@@ -36,7 +36,7 @@ export function ShareButton({ group }: Props) {
             <Input className="flex-1" defaultValue={url} readOnly />
             <CopyButton text={url} />
             <ShareUrlButton
-              text={`Join my group ${group.name} on Splitsville`}
+              text={`Join my group ${group.name} on Split Karega`}
               url={url}
             />
           </div>

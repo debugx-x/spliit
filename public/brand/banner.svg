@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <!-- Social share banner (Open Graph / Twitter), 1200x630 -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#14DCA0"/>
+      <stop offset="1" stop-color="#047857"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.22" cy="0.5" r="0.6">
+      <stop offset="0" stop-color="#14DCA0" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#14DCA0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#0A0F0D"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <g transform="translate(90 195) scale(0.4688)">
+    <rect width="512" height="512" rx="116" fill="url(#bg)"/>
+    <path d="M256 118a138 138 0 0 0 0 276z" fill="#FFFFFF" transform="translate(-22 -20)"/>
+    <path d="M256 118a138 138 0 0 1 0 276z" fill="#FFFFFF" fill-opacity="0.78" transform="translate(22 20)"/>
+  </g>
+  <text x="380" y="300" font-family="Liberation Sans, DejaVu Sans, Arial, sans-serif" font-weight="700" font-size="104" fill="#FFFFFF" letter-spacing="-2">Split <tspan fill="#14DCA0">Karega</tspan></text>
+  <text x="384" y="370" font-family="Liberation Sans, DejaVu Sans, Arial, sans-serif" font-size="32" fill="#B4C4BE">Who paid, who owes whom, for your friend group.</text>
+  <text x="384" y="428" font-family="Liberation Sans, DejaVu Sans, Arial, sans-serif" font-size="28" fill="#6F8A80">Free · No ads · No limits</text>
+</svg>

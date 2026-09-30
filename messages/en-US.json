@@ -1,14 +1,15 @@
 {
   "Homepage": {
     "title": "Share <strong>Expenses</strong> with <strong>Friends & Family</strong>",
-    "description": "Welcome to your new <strong>Splitsville</strong> instance !",
+    "description": "<strong>Split karega?</strong> Keep track of who paid and who owes whom in your friend group. Free, with no limits.",
     "button": {
       "groups": "Go to groups",
       "github": "GitHub"
     }
   },
   "Header": {
-    "groups": "Groups"
+    "groups": "Groups",
+    "friends": "Friends"
   },
   "Footer": {
     "madeIn": "Made in Montréal, Québec 🇨🇦",
@@ -318,6 +319,21 @@
       "noImbursements": "It looks like your group doesn’t need any reimbursement 😁",
       "owes": "<strong>{from}</strong> owes <strong>{to}</strong>",
       "markAsPaid": "Mark as paid"
+    },
+    "Interac": {
+      "button": "Pay with Interac",
+      "title": "Send {amount} to {name}",
+      "description": "Send an Interac e-Transfer from your bank's app with these details, then tap \"I've sent it\" to record the payment.",
+      "email": "Interac email",
+      "amount": "Amount",
+      "message": "Message (optional)",
+      "messageText": "Split Karega · {group}",
+      "cancel": "Cancel",
+      "sent": "I've sent it",
+      "recordedTitle": "Payment recorded",
+      "recordedDescription": "{amount} to {name}",
+      "error": "Couldn't record the payment. Please try again.",
+      "expenseTitle": "Interac e-Transfer"
     }
   },
   "Stats": {
@@ -466,5 +482,22 @@
     "other": {
       "heading": "Other currencies"
     }
+  },
+  "Friends": {
+    "title": "Friends",
+    "loading": "Loading balances…",
+    "overall": "Overall",
+    "owedToYouTotal": "You're owed {amount}",
+    "youOweTotal": "you owe {amount}",
+    "allSettled": "You're all settled up.",
+    "seeByFriend": "See by friend →",
+    "owesYou": "owes you {amount}",
+    "youOwe": "you owe {amount}",
+    "settledUp": "Settled up",
+    "settledTitle": "Settled up",
+    "inGroup": "in {group}",
+    "empty": "No balances with anyone yet. Add expenses in a group to see who owes whom.",
+    "goToGroups": "Go to your groups",
+    "pay": "Pay"
   }
 }

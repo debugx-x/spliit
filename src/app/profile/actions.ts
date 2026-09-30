@@ -8,6 +8,10 @@ const profileSchema = z.object({
   displayName: z.string().min(2, 'Display name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
   defaultCurrency: z.string().length(3, 'Currency must be a 3-letter code'),
+  interacEmail: z.union([
+    z.literal(''),
+    z.string().trim().email('Invalid Interac email address'),
+  ]),
 })
 
 export async function updateProfileAction(prevState: any, formData: FormData) {
@@ -22,7 +26,7 @@ export async function updateProfileAction(prevState: any, formData: FormData) {
     return { error: parsed.error.issues[0].message }
   }
 
-  const { displayName, email, defaultCurrency } = parsed.data
+  const { displayName, email, defaultCurrency, interacEmail } = parsed.data
 
   try {
     const existingEmailUser = await prisma.user.findFirst({
@@ -44,6 +48,7 @@ export async function updateProfileAction(prevState: any, formData: FormData) {
         displayName,
         email,
         defaultCurrency,
+        interacEmail: interacEmail || null,
       },
     })
 

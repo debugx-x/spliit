@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- Split Karega app icon: a coin split into two halves sliding apart -->
+  <!-- Maskable variant: full-bleed background, artwork inside the 80% safe zone -->
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#14DCA0"/>
       <stop offset="1" stop-color="#047857"/>
     </linearGradient>
   </defs>
-  <rect width="512" height="512" rx="116" fill="url(#bg)"/>
-  <g>
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <g transform="translate(256 256) scale(0.72) translate(-256 -256)">
     <path d="M256 118a138 138 0 0 0 0 276z" fill="#FFFFFF" transform="translate(-22 -20)"/>
     <path d="M256 118a138 138 0 0 1 0 276z" fill="#FFFFFF" fill-opacity="0.78" transform="translate(22 20)"/>
   </g>

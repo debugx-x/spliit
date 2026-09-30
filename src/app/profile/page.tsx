@@ -6,8 +6,17 @@ import { ProfileForm } from './profile-form'
 export default async function ProfilePage() {
   const session = await requireSession('/profile')
 
+  // Only what the form needs: this is passed to a client component, so
+  // anything selected here (e.g. the password hash) would reach the browser.
   const user = await prisma.user.findUnique({
     where: { id: session.userId },
+    select: {
+      displayName: true,
+      uniqueId: true,
+      email: true,
+      defaultCurrency: true,
+      interacEmail: true,
+    },
   })
 
   if (!user) {

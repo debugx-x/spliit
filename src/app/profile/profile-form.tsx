@@ -14,7 +14,17 @@ import { Label } from '@/components/ui/label'
 import { useActionState } from 'react'
 import { logoutAction, updateProfileAction } from './actions'
 
-export function ProfileForm({ user }: { user: any }) {
+export function ProfileForm({
+  user,
+}: {
+  user: {
+    displayName: string
+    uniqueId: string
+    email: string
+    defaultCurrency: string
+    interacEmail: string | null
+  }
+}) {
   const [state, formAction, isPending] = useActionState(
     updateProfileAction,
     null,
@@ -73,6 +83,20 @@ export function ProfileForm({ user }: { user: any }) {
                 defaultValue={user.email}
                 required
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="interacEmail">Interac e-Transfer email</Label>
+              <Input
+                id="interacEmail"
+                name="interacEmail"
+                type="email"
+                defaultValue={user.interacEmail ?? ''}
+              />
+              <p className="text-xs text-muted-foreground">
+                Shown to members of your groups when they pay you back. Leave
+                empty to hide it. Your login email is never shown to others.
+              </p>
             </div>
 
             <div className="space-y-2">

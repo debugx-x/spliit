@@ -14,10 +14,10 @@
     "build-image": "./scripts/build-image.sh",
     "start-container": "docker compose --env-file container.env up",
     "test": "jest",
-    "generate-currency-data": "ts-node -T ./src/scripts/generateCurrencyData.ts"
+    "generate-currency-data": "ts-node -T ./src/scripts/generateCurrencyData.ts",
+    "generate-logos": "node scripts/generate-logos.mjs"
   },
   "dependencies": {
-    "@formatjs/intl-localematcher": "^0.5.4",
     "@hookform/resolvers": "^3.3.2",
     "@json2csv/plainjs": "^7.0.6",
     "@prisma/client": "^6.18.0",
@@ -50,7 +50,6 @@
     "jose": "^6.2.3",
     "lucide-react": "^0.501.0",
     "nanoid": "^5.0.4",
-    "negotiator": "^0.6.3",
     "next": "^16.0.7",
     "next-intl": "^4.5.8",
     "next-s3-upload": "^0.3.4",
@@ -84,7 +83,6 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/content-disposition": "^0.5.8",
     "@types/jest": "^29.5.12",
-    "@types/negotiator": "^0.6.3",
     "@types/node": "^20",
     "@types/nodemailer": "^8.0.2",
     "@types/pg": "^8.10.9",

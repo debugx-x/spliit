@@ -146,6 +146,9 @@ model User {
   email           String   @unique
   passwordHash    String
   defaultCurrency String   @default("CAD")
+  // Shown to members of the user's groups when they pay them back (Interac
+  // e-Transfer). The login email is never shown to others.
+  interacEmail    String?
   createdAt       DateTime @default(now())
 
   createdGroups       Group[]               @relation("GroupCreator")
@@ -177,4 +180,14 @@ model UserGroupPreference {
   archived Boolean @default(false)
 
   @@id([userId, groupId])
+}
+
+// Failed logins, for rate limiting (per account and per IP). Keys look like
+// "user:<id>", "id:<identifier>" (unknown accounts) or "ip:<address>".
+model LoginFailure {
+  id        String   @id @default(uuid())
+  key       String
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
 }
