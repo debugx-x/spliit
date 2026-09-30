@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- After logging in, signing up or resetting a password (without a page to return to), you land on the dashboard instead of "My groups".
 - Renamed the app to **Split Karega** (page titles, installed app name, share and export texts, homepage).
 - New Split Karega logo pack: a coin split in two, on green. SVG masters in `public/brand/`; `npm run generate-logos` renders the favicon, app icons (including maskable and Apple touch icon), header logo, iOS splash and social banner from them.
 - Creating or editing groups and expenses requires being logged in; logged-out users are redirected to the login page and brought back afterwards.

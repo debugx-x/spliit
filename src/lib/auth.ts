@@ -63,7 +63,7 @@ export async function requireSession(next: string) {
 
 // Only allow same-origin relative paths as post-login redirect targets,
 // so `?next=` can't be used to send users to another site.
-export function safeRedirectPath(next: unknown, fallback = '/groups') {
+export function safeRedirectPath(next: unknown, fallback = '/') {
   if (
     typeof next !== 'string' ||
     !next.startsWith('/') ||
