@@ -270,3 +270,71 @@ describe('notificationPath', () => {
     )
   })
 })
+
+describe('describeNotification for friend sets', () => {
+  const members = [
+    { name: 'Priya', userId: 'uP' },
+    { name: 'Alex', userId: 'uA' },
+    { name: 'Sam', userId: 'uS' },
+  ]
+  const set = (participants: typeof members) => ({
+    name: participants.map((p) => p.name).join(', '),
+    currency: '$',
+    currencyCode: 'CAD',
+    kind: 'FRIEND_SET' as const,
+    participants,
+  })
+  const say = (type: any, data: object, participants: typeof members) =>
+    describeNotification({
+      type,
+      data,
+      actorName: 'Alex',
+      groupId: 'g1',
+      userId: 'uP',
+      group: set(participants),
+    })
+
+  it('drops "in <group>" for a pair', () => {
+    const pair = members.slice(0, 2)
+    expect(
+      say(
+        'EXPENSE_ADDED',
+        { title: 'Dinner', amount: 8000, share: 4000 },
+        pair,
+      ),
+    ).toBe('Alex added “Dinner” (CA$80.00) · your share CA$40.00')
+    expect(
+      say('PAYMENT_RECEIVED', { amount: 4000, payerName: 'Alex' }, pair),
+    ).toBe('Alex paid you CA$40.00')
+    expect(
+      say('EXPENSE_DELETED', { title: 'Dinner', amount: 8000 }, pair),
+    ).toBe('Alex deleted “Dinner” (CA$80.00)')
+  })
+
+  it('names the other people in a larger set, not the recipient or actor', () => {
+    expect(
+      say(
+        'EXPENSE_ADDED',
+        { title: 'Taxi', amount: 9000, share: 3000 },
+        members,
+      ),
+    ).toBe('Alex added “Taxi” (CA$90.00) with Sam · your share CA$30.00')
+    expect(
+      say(
+        'EXPENSE_CHANGED',
+        { title: 'Taxi', amount: 9900, oldAmount: 9000, share: 3300 },
+        members,
+      ),
+    ).toBe(
+      'Alex changed “Taxi” with Sam: CA$90.00 → CA$99.00 · your share CA$33.00',
+    )
+    // Payments are between two people
+    expect(
+      say(
+        'PAYMENT_RECEIVED',
+        { amount: 3000, payerName: 'Sam', recordedByOther: true },
+        members,
+      ),
+    ).toBe('Sam paid you CA$30.00 (recorded by Alex)')
+  })
+})

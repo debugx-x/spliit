@@ -52,6 +52,8 @@ export type Props = {
   ) => Promise<void>
   protectedParticipantIds?: string[]
   session?: any
+  // Friend sets: only the currency can be changed
+  currencyOnly?: boolean
 }
 
 export function GroupForm({
@@ -59,6 +61,7 @@ export function GroupForm({
   onSubmit,
   protectedParticipantIds = [],
   session,
+  currencyOnly = false,
 }: Props) {
   const locale = useLocale()
   const t = useTranslations('GroupForm')
@@ -144,7 +147,7 @@ export function GroupForm({
               control={form.control}
               name="name"
               render={({ field }) => (
-                <FormItem>
+                <FormItem hidden={currencyOnly}>
                   <FormLabel>{t('NameField.label')}</FormLabel>
                   <FormControl>
                     <Input
@@ -222,180 +225,191 @@ export function GroupForm({
               )}
             />
 
-            <div className="col-span-2">
-              <FormField
-                control={form.control}
-                name="information"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('InformationField.label')}</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        rows={2}
-                        className="text-base"
-                        {...field}
-                        placeholder={t('InformationField.placeholder')}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            {!currencyOnly && (
+              <div className="col-span-2">
+                <FormField
+                  control={form.control}
+                  name="information"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('InformationField.label')}</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          rows={2}
+                          className="text-base"
+                          {...field}
+                          placeholder={t('InformationField.placeholder')}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        <Card className="mb-4">
-          <CardHeader>
-            <CardTitle>{t('Participants.title')}</CardTitle>
-            <CardDescription>{t('Participants.description')}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ul className="flex flex-col gap-2">
-              {fields.map((item, index) => (
-                <li key={item.key}>
-                  <FormField
-                    control={form.control}
-                    name={`participants.${index}.name`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="sr-only">
-                          Participant #{index + 1}
-                        </FormLabel>
-                        <FormControl>
-                          <div className="flex gap-2 items-center">
-                            <Input
-                              className="text-base"
-                              {...field}
-                              placeholder={t('Participants.new')}
-                            />
-                            {form.watch(`participants.${index}.userId`) && (
-                              <span
-                                title={t('Participants.linked')}
-                                className="flex-shrink-0 text-primary"
-                              >
-                                <UserCheck className="w-4 h-4" />
-                                <span className="sr-only">
-                                  {t('Participants.linked')}
-                                </span>
-                              </span>
-                            )}
-                            {item.id &&
-                            protectedParticipantIds.includes(item.id) ? (
-                              <HoverCard>
-                                <HoverCardTrigger>
+        {!currencyOnly && (
+          <>
+            <Card className="mb-4">
+              <CardHeader>
+                <CardTitle>{t('Participants.title')}</CardTitle>
+                <CardDescription>
+                  {t('Participants.description')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="flex flex-col gap-2">
+                  {fields.map((item, index) => (
+                    <li key={item.key}>
+                      <FormField
+                        control={form.control}
+                        name={`participants.${index}.name`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="sr-only">
+                              Participant #{index + 1}
+                            </FormLabel>
+                            <FormControl>
+                              <div className="flex gap-2 items-center">
+                                <Input
+                                  className="text-base"
+                                  {...field}
+                                  placeholder={t('Participants.new')}
+                                />
+                                {form.watch(`participants.${index}.userId`) && (
+                                  <span
+                                    title={t('Participants.linked')}
+                                    className="flex-shrink-0 text-primary"
+                                  >
+                                    <UserCheck className="w-4 h-4" />
+                                    <span className="sr-only">
+                                      {t('Participants.linked')}
+                                    </span>
+                                  </span>
+                                )}
+                                {item.id &&
+                                protectedParticipantIds.includes(item.id) ? (
+                                  <HoverCard>
+                                    <HoverCardTrigger>
+                                      <Button
+                                        variant="ghost"
+                                        className="text-destructive-"
+                                        type="button"
+                                        size="icon"
+                                        disabled
+                                      >
+                                        <Trash2 className="w-4 h-4 text-destructive opacity-50" />
+                                      </Button>
+                                    </HoverCardTrigger>
+                                    <HoverCardContent
+                                      align="end"
+                                      className="text-sm"
+                                    >
+                                      {t('Participants.protectedParticipant')}
+                                    </HoverCardContent>
+                                  </HoverCard>
+                                ) : (
                                   <Button
                                     variant="ghost"
-                                    className="text-destructive-"
+                                    className="text-destructive"
+                                    onClick={() => remove(index)}
                                     type="button"
                                     size="icon"
-                                    disabled
                                   >
-                                    <Trash2 className="w-4 h-4 text-destructive opacity-50" />
+                                    <Trash2 className="w-4 h-4" />
                                   </Button>
-                                </HoverCardTrigger>
-                                <HoverCardContent
-                                  align="end"
-                                  className="text-sm"
-                                >
-                                  {t('Participants.protectedParticipant')}
-                                </HoverCardContent>
-                              </HoverCard>
-                            ) : (
-                              <Button
-                                variant="ghost"
-                                className="text-destructive"
-                                onClick={() => remove(index)}
-                                type="button"
-                                size="icon"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            )}
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-          <CardFooter className="flex flex-wrap gap-2">
-            <Button
-              variant="secondary"
-              onClick={() => {
-                append({ name: '' })
-              }}
-              type="button"
-            >
-              {t('Participants.add')}
-            </Button>
-            <AddFriendButton
-              excludedUserIds={form
-                .watch('participants')
-                .flatMap((p) => (p.userId ? [p.userId] : []))}
-              onAdd={(user) => {
-                // Same naming rule as joining: suffix the name if it's taken
-                const names = new Set(
-                  form.getValues('participants').map((p) => p.name),
-                )
-                const base = user.displayName.slice(0, 44)
-                let name = base
-                for (let i = 2; names.has(name); i++) name = `${base} (${i})`
-                append({ name, userId: user.id })
-              }}
-            />
-          </CardFooter>
-        </Card>
+                                )}
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+              <CardFooter className="flex flex-wrap gap-2">
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    append({ name: '' })
+                  }}
+                  type="button"
+                >
+                  {t('Participants.add')}
+                </Button>
+                <AddFriendButton
+                  excludedUserIds={form
+                    .watch('participants')
+                    .flatMap((p) => (p.userId ? [p.userId] : []))}
+                  onAdd={(user) => {
+                    // Same naming rule as joining: suffix the name if it's taken
+                    const names = new Set(
+                      form.getValues('participants').map((p) => p.name),
+                    )
+                    const base = user.displayName.slice(0, 44)
+                    let name = base
+                    for (let i = 2; names.has(name); i++)
+                      name = `${base} (${i})`
+                    append({ name, userId: user.id })
+                  }}
+                />
+              </CardFooter>
+            </Card>
 
-        <Card className="mb-4">
-          <CardHeader>
-            <CardTitle>{t('Settings.title')}</CardTitle>
-            <CardDescription>{t('Settings.description')}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid sm:grid-cols-2 gap-4">
-              {activeUser !== null && (
-                <FormItem>
-                  <FormLabel>{t('Settings.ActiveUserField.label')}</FormLabel>
-                  <FormControl>
-                    <Select
-                      onValueChange={(value) => {
-                        setActiveUser(value)
-                      }}
-                      defaultValue={activeUser}
-                    >
-                      <SelectTrigger>
-                        <SelectValue
-                          placeholder={t(
-                            'Settings.ActiveUserField.placeholder',
-                          )}
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {[
-                          { name: t('Settings.ActiveUserField.none') },
-                          ...form.watch('participants'),
-                        ]
-                          .filter((item) => item.name.length > 0)
-                          .map(({ name }) => (
-                            <SelectItem key={name} value={name}>
-                              {name}
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormDescription>
-                    {t('Settings.ActiveUserField.description')}
-                  </FormDescription>
-                </FormItem>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+            <Card className="mb-4">
+              <CardHeader>
+                <CardTitle>{t('Settings.title')}</CardTitle>
+                <CardDescription>{t('Settings.description')}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {activeUser !== null && (
+                    <FormItem>
+                      <FormLabel>
+                        {t('Settings.ActiveUserField.label')}
+                      </FormLabel>
+                      <FormControl>
+                        <Select
+                          onValueChange={(value) => {
+                            setActiveUser(value)
+                          }}
+                          defaultValue={activeUser}
+                        >
+                          <SelectTrigger>
+                            <SelectValue
+                              placeholder={t(
+                                'Settings.ActiveUserField.placeholder',
+                              )}
+                            />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {[
+                              { name: t('Settings.ActiveUserField.none') },
+                              ...form.watch('participants'),
+                            ]
+                              .filter((item) => item.name.length > 0)
+                              .map(({ name }) => (
+                                <SelectItem key={name} value={name}>
+                                  {name}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormDescription>
+                        {t('Settings.ActiveUserField.description')}
+                      </FormDescription>
+                    </FormItem>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </>
+        )}
 
         <div className="flex mt-4 gap-2">
           <SubmitButton

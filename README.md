@@ -7,6 +7,8 @@ Spliit is a free and open source alternative to Splitwise. You can either use th
 ## Features
 
 - [x] Create a group and share it with friends
+- [x] Add expenses with one or more friends outside groups
+- [x] Dashboard: who you owe and who owes you, across groups and friends
 - [x] Create expenses with description
 - [x] Display group balances
 - [x] Create reimbursement expenses

@@ -37,8 +37,13 @@ export function GroupLayoutClient({
 
   const props =
     isLoading || !data?.group
-      ? { isLoading: true as const, groupId, group: undefined }
-      : { isLoading: false as const, groupId, group: data.group }
+      ? { isLoading: true as const, groupId, group: undefined, participantId }
+      : {
+          isLoading: false as const,
+          groupId,
+          group: data.group,
+          participantId,
+        }
 
   if (isLoading) {
     return (

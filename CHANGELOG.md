@@ -15,6 +15,8 @@ All notable changes to this project will be documented in this file.
 - Settle up with Interac: "Pay with Interac" on your own suggested reimbursements shows the friend's Interac email, the amount and a message to copy into your bank app, then records the payment in one tap. Each user has an editable "Interac e-Transfer email" in their profile (starting as their account email); it's the only email other members see.
 - "Forgot password?": a one-time reset link (valid 1 hour) sent by email through any SMTP server, e.g. a Gmail account (see README "Password reset emails"). Reset requests are limited to 5 per IP address per 15 minutes, and a reset clears the account's failed-login lockout.
 - Notifications: payments, new expenses, changes and being added to a group show up under a bell in the header (/notifications), and in a daily email summary. Each user chooses in their profile which kinds of updates they get by email (see README "Notifications").
+- Expenses with friends outside groups: "Add expense" on the Friends page and dashboard, with one or more friends. Each set of friends gets a hidden group (you + Alex, you + Alex & Sam), so balances, settling up, notifications and exports work as in groups. These don't appear in "My groups", can't be joined by link, and only their currency can be changed.
+- Dashboard: logged-in users land on a Splitwise-style dashboard with totals, "You owe" and "You are owed", their groups, recent activity, and quick "Add an expense" and "Settle up".
 
 ### Changed
 

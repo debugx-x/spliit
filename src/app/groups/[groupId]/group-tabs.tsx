@@ -5,9 +5,11 @@ import { usePathname, useRouter } from 'next/navigation'
 
 type Props = {
   groupId: string
+  // Friend sets have no information page
+  isFriendSet?: boolean
 }
 
-export function GroupTabs({ groupId }: Props) {
+export function GroupTabs({ groupId, isFriendSet = false }: Props) {
   const t = useTranslations()
   const pathname = usePathname()
   const value =
@@ -25,7 +27,11 @@ export function GroupTabs({ groupId }: Props) {
       <TabsList>
         <TabsTrigger value="expenses">{t('Expenses.title')}</TabsTrigger>
         <TabsTrigger value="balances">{t('Balances.title')}</TabsTrigger>
-        <TabsTrigger value="information">{t('Information.title')}</TabsTrigger>
+        {!isFriendSet && (
+          <TabsTrigger value="information">
+            {t('Information.title')}
+          </TabsTrigger>
+        )}
         <TabsTrigger value="stats">{t('Stats.title')}</TabsTrigger>
         <TabsTrigger value="activity">{t('Activity.title')}</TabsTrigger>
         <TabsTrigger value="edit">{t('Settings.title')}</TabsTrigger>
