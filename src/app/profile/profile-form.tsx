@@ -23,6 +23,10 @@ export function ProfileForm({
     email: string
     defaultCurrency: string
     interacEmail: string | null
+    notifyPayments: boolean
+    notifyAddedToGroup: boolean
+    notifyNewExpenses: boolean
+    notifyExpenseChanges: boolean
   }
 }) {
   const [state, formAction, isPending] = useActionState(
@@ -67,7 +71,7 @@ export function ProfileForm({
                 name="uniqueId"
                 defaultValue={user.uniqueId}
                 disabled
-                className="bg-slate-100"
+                className="bg-muted"
               />
               <p className="text-xs text-muted-foreground">
                 Your Unique ID cannot be changed.
@@ -109,6 +113,40 @@ export function ProfileForm({
                 required
               />
             </div>
+
+            <fieldset className="space-y-3 pt-2">
+              <legend className="text-sm font-medium">
+                Daily email summary
+              </legend>
+              <p className="text-xs text-muted-foreground">
+                At most one email a day, only when something happened. The bell
+                in the app always shows everything.
+              </p>
+              {(
+                [
+                  ['notifyPayments', 'Someone pays me'],
+                  ['notifyAddedToGroup', 'Someone adds me to a group'],
+                  ['notifyNewExpenses', 'A new expense I’m in'],
+                  [
+                    'notifyExpenseChanges',
+                    'An expense I’m in is changed or deleted',
+                  ],
+                ] as const
+              ).map(([name, label]) => (
+                <label
+                  key={name}
+                  className="flex items-center gap-2 text-sm cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    name={name}
+                    defaultChecked={user[name]}
+                    className="h-4 w-4 accent-primary"
+                  />
+                  {label}
+                </label>
+              ))}
+            </fieldset>
           </CardContent>
           <CardFooter>
             <Button type="submit" disabled={isPending}>

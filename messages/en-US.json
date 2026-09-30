@@ -9,7 +9,9 @@
   },
   "Header": {
     "groups": "Groups",
-    "friends": "Friends"
+    "friends": "Friends",
+    "notifications": "Notifications",
+    "unreadNotifications": "{count, plural, one {# unread notification} other {# unread notifications}}"
   },
   "Footer": {
     "madeIn": "Made in Montréal, Québec 🇨🇦",
@@ -499,5 +501,13 @@
     "empty": "No balances with anyone yet. Add expenses in a group to see who owes whom.",
     "goToGroups": "Go to your groups",
     "pay": "Pay"
+  },
+  "Notifications": {
+    "title": "Notifications",
+    "loading": "Loading notifications…",
+    "empty": "Nothing yet. You'll see payments, new expenses and changes in your groups here.",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "emailSettings": "Choose which ones you also get in a daily email in your <link>profile</link>."
   }
 }

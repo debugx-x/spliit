@@ -11,18 +11,19 @@ datasource db {
 }
 
 model Group {
-  id           String                @id
-  name         String
-  information  String?               @db.Text
-  currency     String                @default("$")
-  currencyCode String?
-  participants Participant[]
-  expenses     Expense[]
-  activities   Activity[]
-  preferences  UserGroupPreference[]
-  createdAt    DateTime              @default(now())
-  creatorId    String?
-  creator      User?                 @relation("GroupCreator", fields: [creatorId], references: [id])
+  id            String                @id
+  name          String
+  information   String?               @db.Text
+  currency      String                @default("$")
+  currencyCode  String?
+  participants  Participant[]
+  expenses      Expense[]
+  activities    Activity[]
+  preferences   UserGroupPreference[]
+  notifications Notification[]
+  createdAt     DateTime              @default(now())
+  creatorId     String?
+  creator       User?                 @relation("GroupCreator", fields: [creatorId], references: [id])
 }
 
 model Participant {
@@ -140,21 +141,28 @@ enum ActivityType {
 }
 
 model User {
-  id              String   @id @default(uuid())
-  uniqueId        String   @unique
-  displayName     String
-  email           String   @unique
-  passwordHash    String
-  defaultCurrency String   @default("CAD")
+  id                   String   @id @default(uuid())
+  uniqueId             String   @unique
+  displayName          String
+  email                String   @unique
+  passwordHash         String
+  defaultCurrency      String   @default("CAD")
   // Shown to members of the user's groups when they pay them back (Interac
   // e-Transfer). The login email is never shown to others.
-  interacEmail    String?
-  createdAt       DateTime @default(now())
+  interacEmail         String?
+  // Which notifications go into the daily email summary (the in-app bell
+  // always shows everything)
+  notifyPayments       Boolean  @default(true)
+  notifyAddedToGroup   Boolean  @default(true)
+  notifyNewExpenses    Boolean  @default(true)
+  notifyExpenseChanges Boolean  @default(true)
+  createdAt            DateTime @default(now())
 
   createdGroups       Group[]               @relation("GroupCreator")
   participations      Participant[]
   groupPreferences    UserGroupPreference[]
   passwordResetTokens PasswordResetToken[]
+  notifications       Notification[]
 }
 
 // One-time password reset links. Only a SHA-256 hash of the token is stored.
@@ -190,4 +198,36 @@ model LoginFailure {
   createdAt DateTime @default(now())
 
   @@index([key, createdAt])
+}
+
+enum NotificationType {
+  PAYMENT_RECEIVED
+  ADDED_TO_GROUP
+  EXPENSE_ADDED
+  EXPENSE_CHANGED
+  EXPENSE_DELETED
+}
+
+// Something that happened to a user in one of their groups. Shown by the
+// in-app bell and included in the daily email summary. `data` is a snapshot
+// of what the sentence needs (title, amounts in cents, the user's share), so
+// later edits or deletes of the expense don't change it.
+model Notification {
+  id        String           @id @default(uuid())
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  type      NotificationType
+  group     Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId   String
+  // Only used for links: the expense may since have been deleted
+  expenseId String?
+  actorName String
+  data      Json             @default("{}")
+  createdAt DateTime         @default(now())
+  readAt    DateTime?
+  // Set when included in (or skipped by) the daily email summary
+  emailedAt DateTime?
+
+  @@index([userId, createdAt])
+  @@index([emailedAt])
 }

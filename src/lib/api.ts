@@ -1,4 +1,15 @@
 import { assignParticipantLinks } from '@/lib/membership'
+import {
+  Actor,
+  ExpenseSnapshot,
+  expenseSnapshotFromForm,
+  getGroupParticipants,
+  planAddedToGroup,
+  planExpenseCreated,
+  planExpenseDeleted,
+  planExpenseUpdated,
+  saveNotifications,
+} from '@/lib/notifications'
 import { prisma } from '@/lib/prisma'
 import { ExpenseFormValues, GroupFormValues } from '@/lib/schemas'
 import {
@@ -32,7 +43,7 @@ export async function createGroup(
   const validUserIds = await getExistingUserIds(
     groupFormValues.participants.map((p) => p.userId),
   )
-  return prisma.group.create({
+  const group = await prisma.group.create({
     data: {
       id: randomId(),
       name: groupFormValues.name,
@@ -55,12 +66,26 @@ export async function createGroup(
     },
     include: { participants: true },
   })
+  if (creatorId && creatorDisplayName) {
+    await saveNotifications(
+      planAddedToGroup(
+        group.participants.map((p) => p.userId),
+        creatorId,
+      ),
+      {
+        groupId: group.id,
+        actor: { userId: creatorId, displayName: creatorDisplayName },
+      },
+    )
+  }
+  return group
 }
 
 export async function createExpense(
   expenseFormValues: ExpenseFormValues,
   groupId: string,
   participantId?: string,
+  actor?: Actor,
 ): Promise<Expense> {
   const group = await getGroup(groupId)
   if (!group) throw new Error(`Invalid group ID: ${groupId}`)
@@ -88,7 +113,7 @@ export async function createExpense(
     groupId,
   )
 
-  return prisma.expense.create({
+  const expense = await prisma.expense.create({
     data: {
       id: expenseId,
       groupId,
@@ -131,12 +156,24 @@ export async function createExpense(
       notes: expenseFormValues.notes,
     },
   })
+  if (actor) {
+    await saveNotifications(
+      planExpenseCreated(
+        expenseSnapshotFromForm(expenseFormValues),
+        group.participants,
+        actor.userId,
+      ),
+      { groupId, expenseId, actor },
+    )
+  }
+  return expense
 }
 
 export async function deleteExpense(
   groupId: string,
   expenseId: string,
   participantId?: string,
+  actor?: Actor,
 ) {
   const existingExpense = await getExpense(groupId, expenseId)
   if (!existingExpense) throw new Error(`Invalid expense ID: ${expenseId}`)
@@ -150,6 +187,37 @@ export async function deleteExpense(
     where: { id: expenseId },
     include: { paidFor: true, paidBy: true },
   })
+  if (actor) {
+    await saveNotifications(
+      planExpenseDeleted(
+        storedExpenseSnapshot(existingExpense),
+        await getGroupParticipants(groupId),
+        actor.userId,
+      ),
+      { groupId, expenseId, actor },
+    )
+  }
+}
+
+function storedExpenseSnapshot(expense: {
+  title: string
+  amount: number
+  paidById: string
+  splitMode: ExpenseSnapshot['splitMode']
+  isReimbursement: boolean
+  paidFor: { participantId: string; shares: number }[]
+}): ExpenseSnapshot {
+  return {
+    title: expense.title,
+    amount: expense.amount,
+    paidById: expense.paidById,
+    splitMode: expense.splitMode,
+    isReimbursement: expense.isReimbursement,
+    paidFor: expense.paidFor.map((p) => ({
+      participantId: p.participantId,
+      shares: p.shares,
+    })),
+  }
 }
 
 export async function getGroupExpensesParticipants(groupId: string) {
@@ -181,6 +249,7 @@ export async function updateExpense(
   expenseId: string,
   expenseFormValues: ExpenseFormValues,
   participantId?: string,
+  actor?: Actor,
 ) {
   const group = await getGroup(groupId)
   if (!group) throw new Error(`Invalid group ID: ${groupId}`)
@@ -229,7 +298,7 @@ export async function updateExpense(
     existingExpense.expenseDate,
   )
 
-  return prisma.expense.update({
+  const expense = await prisma.expense.update({
     where: { id: expenseId },
     data: {
       expenseDate: expenseFormValues.expenseDate,
@@ -307,12 +376,25 @@ export async function updateExpense(
       notes: expenseFormValues.notes,
     },
   })
+  if (actor) {
+    await saveNotifications(
+      planExpenseUpdated(
+        storedExpenseSnapshot(existingExpense),
+        expenseSnapshotFromForm(expenseFormValues),
+        group.participants,
+        actor.userId,
+      ),
+      { groupId, expenseId, actor },
+    )
+  }
+  return expense
 }
 
 export async function updateGroup(
   groupId: string,
   groupFormValues: GroupFormValues,
   participantId?: string,
+  actor?: Actor,
 ) {
   const existingGroup = await getGroup(groupId)
   if (!existingGroup) throw new Error('Invalid group ID')
@@ -326,9 +408,25 @@ export async function updateGroup(
     newParticipants.map((p) => p.userId),
   )
 
+  const createdParticipants = assignParticipantLinks(
+    newParticipants.map(({ name, userId }) => ({
+      id: randomId(),
+      name,
+      userId,
+    })),
+    {
+      validUserIds,
+      // Includes participants removed in this same update: Prisma
+      // doesn't guarantee the removal runs before the creation.
+      alreadyLinkedUserIds: existingGroup.participants.flatMap((p) =>
+        p.userId ? [p.userId] : [],
+      ),
+    },
+  )
+
   await logActivity(groupId, ActivityType.UPDATE_GROUP, { participantId })
 
-  return prisma.group.update({
+  const group = await prisma.group.update({
     where: { id: groupId },
     data: {
       name: groupFormValues.name,
@@ -347,26 +445,20 @@ export async function updateGroup(
               name: participant.name,
             },
           })),
-        createMany: {
-          data: assignParticipantLinks(
-            newParticipants.map(({ name, userId }) => ({
-              id: randomId(),
-              name,
-              userId,
-            })),
-            {
-              validUserIds,
-              // Includes participants removed in this same update: Prisma
-              // doesn't guarantee the removal runs before the creation.
-              alreadyLinkedUserIds: existingGroup.participants.flatMap((p) =>
-                p.userId ? [p.userId] : [],
-              ),
-            },
-          ),
-        },
+        createMany: { data: createdParticipants },
       },
     },
   })
+  if (actor) {
+    await saveNotifications(
+      planAddedToGroup(
+        createdParticipants.map((p) => p.userId),
+        actor.userId,
+      ),
+      { groupId, actor },
+    )
+  }
+  return group
 }
 
 export async function getGroup(groupId: string) {

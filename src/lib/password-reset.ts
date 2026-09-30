@@ -1,4 +1,5 @@
 import { sendEmail } from '@/lib/email'
+import { emailButton, emailLayout, escapeHtml } from '@/lib/email-layout'
 import { clearAccountLoginFailures } from '@/lib/login-rate-limit'
 import { prisma } from '@/lib/prisma'
 import { createHash, randomBytes } from 'crypto'
@@ -56,31 +57,19 @@ export async function requestPasswordReset(
   await sendEmail({ to: user.email, ...resetEmail(user.displayName, link) })
 }
 
-// The reset email, in plain text and a simple HTML version (inline styles,
-// since email clients ignore stylesheets).
+// The reset email, in plain text and a simple HTML version.
 export function resetEmail(displayName: string, link: string) {
   const name = escapeHtml(displayName)
   const href = escapeHtml(link)
   return {
     subject: 'Reset your Split Karega password',
     text: `Hi ${displayName},\n\nSomeone (hopefully you) asked to reset your Split Karega password. Open this link to choose a new one:\n\n${link}\n\nThe link works once and expires in 1 hour. If you didn't ask for this, you can ignore this email.`,
-    html: `<div style="font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:480px;margin:0 auto;padding:24px;color:#111827;line-height:1.5">
-<p style="font-size:20px;font-weight:700;margin:0 0 24px">Split <span style="color:#047857">Karega</span></p>
-<p>Hi ${name},</p>
+    html: emailLayout(`<p>Hi ${name},</p>
 <p>Someone (hopefully you) asked to reset your Split Karega password.</p>
-<p style="margin:24px 0"><a href="${href}" style="display:inline-block;background:#047857;color:#ffffff;text-decoration:none;font-weight:600;padding:12px 20px;border-radius:8px">Choose a new password</a></p>
+${emailButton(href, 'Choose a new password')}
 <p style="font-size:14px;color:#6b7280">The link works once and expires in 1 hour. If you didn't ask for this, you can ignore this email.</p>
-<p style="font-size:12px;color:#6b7280;word-break:break-all">If the button doesn't work, open this link: <a href="${href}" style="color:#047857">${href}</a></p>
-</div>`,
+<p style="font-size:12px;color:#6b7280;word-break:break-all">If the button doesn't work, open this link: <a href="${href}" style="color:#047857">${href}</a></p>`),
   }
-}
-
-function escapeHtml(value: string) {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
 }
 
 // Whether a reset link is still usable (to show the form or an error).

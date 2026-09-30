@@ -10,10 +10,10 @@ export const deleteGroupExpenseProcedure = memberProcedure
       participantId: z.string().optional(),
     }),
   )
-  .mutation(async ({ input: { expenseId, groupId, participantId } }) => {
+  .mutation(async ({ input: { expenseId, groupId, participantId }, ctx }) => {
     if (!(await getExpense(groupId, expenseId))) {
       throw new TRPCError({ code: 'NOT_FOUND', message: 'Expense not found' })
     }
-    await deleteExpense(groupId, expenseId, participantId)
+    await deleteExpense(groupId, expenseId, participantId, ctx.session)
     return {}
   })

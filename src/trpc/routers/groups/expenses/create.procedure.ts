@@ -11,11 +11,12 @@ export const createGroupExpenseProcedure = memberProcedure
     }),
   )
   .mutation(
-    async ({ input: { groupId, expenseFormValues, participantId } }) => {
+    async ({ input: { groupId, expenseFormValues, participantId }, ctx }) => {
       const expense = await createExpense(
         expenseFormValues,
         groupId,
         participantId,
+        ctx.session,
       )
       return { expenseId: expense.id }
     },

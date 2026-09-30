@@ -42,6 +42,8 @@ const envSchema = z
     // smtps://you%40gmail.com:<app-password>@smtp.gmail.com:465
     SMTP_URL: z.string().url().optional(),
     EMAIL_FROM: z.string().optional(),
+    // Sent by Vercel Cron to /api/cron/notifications (the daily email summary)
+    CRON_SECRET: z.string().optional(),
   })
   .superRefine((env, ctx) => {
     if (

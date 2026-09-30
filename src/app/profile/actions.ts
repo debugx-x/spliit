@@ -2,7 +2,16 @@
 
 import { createSession, getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
+
+// Daily email summary checkboxes (unchecked boxes aren't submitted)
+const NOTIFICATION_PREFERENCES = [
+  'notifyPayments',
+  'notifyAddedToGroup',
+  'notifyNewExpenses',
+  'notifyExpenseChanges',
+] as const
 
 const profileSchema = z.object({
   displayName: z.string().min(2, 'Display name must be at least 2 characters'),
@@ -49,6 +58,9 @@ export async function updateProfileAction(prevState: any, formData: FormData) {
         email,
         defaultCurrency,
         interacEmail: interacEmail || null,
+        ...Object.fromEntries(
+          NOTIFICATION_PREFERENCES.map((key) => [key, formData.has(key)]),
+        ),
       },
     })
 
@@ -58,6 +70,7 @@ export async function updateProfileAction(prevState: any, formData: FormData) {
       displayName: updatedUser.displayName,
     })
 
+    revalidatePath('/profile')
     return { success: 'Profile updated successfully.', error: null }
   } catch (error) {
     return { error: 'Failed to update profile.', success: null }

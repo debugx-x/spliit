@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - Friends view (/friends): what each friend owes you, or you owe them, across all your groups, per currency, with a per-group breakdown. "My groups" shows your overall totals.
 - Settle up with Interac: "Pay with Interac" on your own suggested reimbursements shows the friend's Interac email, the amount and a message to copy into your bank app, then records the payment in one tap. Each user has an editable "Interac e-Transfer email" in their profile (starting as their account email); it's the only email other members see.
 - "Forgot password?": a one-time reset link (valid 1 hour) sent by email through any SMTP server, e.g. a Gmail account (see README "Password reset emails"). Reset requests are limited to 5 per IP address per 15 minutes, and a reset clears the account's failed-login lockout.
+- Notifications: payments, new expenses, changes and being added to a group show up under a bell in the header (/notifications), and in a daily email summary. Each user chooses in their profile which kinds of updates they get by email (see README "Notifications").
 
 ### Changed
 
